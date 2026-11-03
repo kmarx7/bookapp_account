@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Shell(npx --yes create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --use-npm --yes)",
+      "Shell(git status 2>&1 | head -20; echo \"--- remotes ---\"; git remote -v 2>&1; echo \"--- log ---\"; git log --oneline -5 2>&1)",
+      "Shell(git:*)",
+      "Shell(npx --yes create-next-app@latest tmp_scaffold --typescript --tailwind --eslint --app --src-dir --import-alias @/* --use-npm --yes 2 >& 1)",
+      "Shell(rm:*)",
+      "Shell(for:*)",
+      "Shell(do:*)",
+      "Shell([:*)",
+      "Shell(}:*)",
+      "Shell(mv:*)",
+      "Shell(done:*)",
+      "Shell(rmdir:*)"
+    ],
+    "deny": [],
+    "defaultMode": "default"
+  }
+}
