@@ -1,69 +1,175 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import Link from "next/link";
+import { Plus } from "lucide-react";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { Card, CardTitle } from "@/components/ui/Card";
+import { StatBlock, toneForValue } from "@/components/ui/StatBlock";
+import { Badge } from "@/components/ui/Badge";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { MonthSwitcher } from "@/components/ui/MonthSwitcher";
+import { Gauge } from "@/components/ui/Gauge";
+import { useSelectedMonth } from "@/hooks/useSelectedMonth";
+import { useAppStore } from "@/store/useAppStore";
+import { calcBalanceSheet } from "@/lib/calculations/balanceSheet";
+import { calcIncomeStatement } from "@/lib/calculations/incomeStatement";
+import { AUDIT_OPINION_LABELS } from "@/lib/constants";
+import { formatKRW, formatPercent, formatDate } from "@/lib/format";
+
+export default function HomePage() {
+  const { year, month, label, prev, next } = useSelectedMonth();
+  const user = useAppStore((state) => state.user);
+  const income = useAppStore((state) =>
+    state.incomeStatements.find((item) => item.year === year && item.month === month),
+  );
+  const balanceSheet = useAppStore((state) =>
+    [...state.balanceSheets].sort((a, b) => b.baseDate.localeCompare(a.baseDate))[0],
+  );
+  const annual = useAppStore((state) =>
+    state.annualTrackings.find((item) => item.year === year),
+  );
+  const incomeStatements = useAppStore((state) => state.incomeStatements);
+  const cashFlows = useAppStore((state) => state.cashFlows);
+
+  const incomeComputed = income ? calcIncomeStatement(income) : null;
+  const balanceComputed = balanceSheet ? calcBalanceSheet(balanceSheet) : null;
+
+  const recent = [...incomeStatements]
+    .map((item) => ({ id: item.id, label: `${item.year}년 ${item.month}월 손익계산서`, at: item.updatedAt }))
+    .concat(
+      cashFlows.map((item) => ({ id: `cf-${item.id}`, label: `${item.year}년 ${item.month}월 현금흐름표`, at: item.updatedAt })),
+    )
+    .sort((a, b) => b.at.localeCompare(a.at))
+    .slice(0, 5);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
+    <>
+      <PageHeader
+        title={`${user?.nickname ?? "대표"}님의 결산`}
+        description={user ? `설립일 ${formatDate(user.foundedAt)}` : undefined}
+      />
+
+      <div className="mb-4">
+        <MonthSwitcher label={label} onPrev={prev} onNext={next} />
+      </div>
+
+      <div className="flex flex-col gap-4">
+        <Card>
+          <CardTitle hint="손익계산서">이번 달 요약</CardTitle>
+          {incomeComputed ? (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <StatBlock label="매출총이익" value={formatKRW(incomeComputed.grossProfit)} />
+              <StatBlock label="영업비용" value={formatKRW(incomeComputed.totalExpenses)} tone="negative" />
+              <StatBlock
+                label="영업이익(순이익)"
+                value={formatKRW(incomeComputed.operatingIncome)}
+                tone={toneForValue(incomeComputed.operatingIncome)}
+              />
+            </div>
+          ) : (
+            <EmptyState
+              title="이번 달 손익계산서가 없습니다"
+              description="매출과 비용을 입력하면 순이익이 자동으로 계산됩니다."
+              action={
+                <Link
+                  href="/income"
+                  className="inline-flex h-9 items-center rounded-xl bg-brand px-3 text-sm text-white"
+                >
+                  손익계산서 작성
+                </Link>
+              }
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+          )}
+        </Card>
+
+        <Card>
+          <CardTitle
+            hint={balanceSheet ? `기준일 ${formatDate(balanceSheet.baseDate)}` : undefined}
           >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+            재무상태표 요약
+          </CardTitle>
+          {balanceComputed ? (
+            <div className="flex flex-col gap-4">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <StatBlock label="자산" value={formatKRW(balanceComputed.totalAssets)} />
+                <StatBlock label="부채" value={formatKRW(balanceComputed.totalDebts)} tone="negative" />
+                <StatBlock
+                  label="자기자본"
+                  value={formatKRW(balanceComputed.equity)}
+                  tone={toneForValue(balanceComputed.equity)}
+                />
+              </div>
+              <Gauge ratio={balanceComputed.equityRatio} label="자기자본 비율" />
+            </div>
+          ) : (
+            <EmptyState
+              title="아직 재무상태표가 없습니다"
+              description="자산과 부채를 등기하면 자기자본이 계산됩니다."
+              action={
+                <Link
+                  href="/balance-sheet"
+                  className="inline-flex h-9 items-center rounded-xl bg-brand px-3 text-sm text-white"
+                >
+                  재무상태표 작성
+                </Link>
+              }
+            />
+          )}
+        </Card>
+
+        <Card>
+          <CardTitle hint={`${year}년`}>감사의견 상태</CardTitle>
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-muted">
+              {annual?.auditOpinion
+                ? `올해 의견: ${AUDIT_OPINION_LABELS[annual.auditOpinion]}`
+                : "아직 감사의견을 작성하지 않았습니다."}
+            </p>
+            <Badge tone={annual?.auditOpinion ? "positive" : "neutral"}>
+              {annual?.auditOpinion ? AUDIT_OPINION_LABELS[annual.auditOpinion] : "미작성"}
+            </Badge>
+          </div>
+          <Link
+            href="/annual"
+            className="mt-4 inline-flex text-sm font-medium text-brand hover:underline"
+          >
+            연간 추적에서 서명하기 →
+          </Link>
+        </Card>
+
+        <Card>
+          <CardTitle>최근 활동</CardTitle>
+          {recent.length > 0 ? (
+            <ul className="flex flex-col divide-y divide-border">
+              {recent.map((item) => (
+                <li key={item.id} className="flex items-center justify-between py-2.5 text-sm">
+                  <span className="text-brand-dark">{item.label}</span>
+                  <span className="num text-xs text-muted">{formatDate(item.at)}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-muted">아직 기록이 없습니다.</p>
+          )}
+        </Card>
+
+        <Card>
+          <CardTitle>자기자본 비율 게이지</CardTitle>
+          <p className="text-sm text-muted">
+            {balanceComputed
+              ? `현재 자기자본 비율은 ${formatPercent(balanceComputed.equityRatio)}입니다.`
+              : "재무상태표를 작성하면 비율이 표시됩니다."}
+          </p>
+        </Card>
+      </div>
+
+      <Link
+        href="/income"
+        className="fixed bottom-20 right-5 z-10 flex h-14 w-14 items-center justify-center rounded-full bg-brand text-white shadow-lg transition-transform hover:scale-105 md:bottom-8 md:right-8"
+        aria-label="빠른 입력"
+      >
+        <Plus size={24} />
+      </Link>
+    </>
   );
 }
