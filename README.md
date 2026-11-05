@@ -43,12 +43,23 @@ npm run dev
 | `npm run lint` | ESLint |
 | `npm test` | 계산·상태 단위 테스트 (Vitest) |
 
+## 배포
+
+Vercel에 배포되어 있다.
+
+- **프로덕션**: https://bookapp-account.vercel.app
+- **CLI 배포**: 프로젝트 루트에서 `vercel --prod`
+- 현재는 CLI로 배포한 상태다. Vercel 대시보드에서 `kmarx7/bookapp_account` 리포지토리를
+  연결하면 이후 `main` 푸시마다 자동 배포된다.
+
+PWA 설치 프롬프트와 service worker는 HTTPS(또는 localhost)에서만 동작하므로 배포 URL에서 확인한다.
+
 ## 구조
 
 ```
 src/
 ├─ app/            라우트 (홈/손익/재무상태/현금흐름/부채/연간/도구함/설정)
-├─ components/     layout · ui · forms · charts · signature
+├─ components/     layout · ui · forms · charts · signature · pwa
 ├─ lib/
 │  ├─ calculations/  도메인 계산 순수 함수 (+ 테스트)
 │  ├─ storage/       LocalStorage 래퍼 · 스키마/마이그레이션 · 백업
