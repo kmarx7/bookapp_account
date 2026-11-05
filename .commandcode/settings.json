@@ -30,7 +30,12 @@
       "Shell(lsof:*)",
       "Shell(awk:*)",
       "Shell(for pid in 95915 29181 40059; do echo \"=== PID $pid ===\"; ps -p $pid -o pid=,ppid=,command= 2>/dev/null; echo -n \"cwd: \"; lsof -a -p $pid -d cwd -Fn 2>/dev/null | grep '^n' | cut -c2-; done; echo \"=== my old test port 3123 ===\"; lsof -nP -iTCP:3123 -sTCP:LISTEN 2>/dev/null || echo \"3123 free\"; echo \"=== port 3002 ===\"; lsof -nP -iTCP:3002 -sTCP:LISTEN 2>/dev/null || echo \"3002 free\")",
-      "Shell(for p in / /income /annual; do code=$(curl -s -o /dev/null -w \"%{http_code}\" \"http://localhost:3002$p\"); echo \"$code $p\"; done; echo \"--- port 3002 owner ---\"; lsof -nP -iTCP:3002 -sTCP:LISTEN 2>/dev/null | tail -1)"
+      "Shell(for p in / /income /annual; do code=$(curl -s -o /dev/null -w \"%{http_code}\" \"http://localhost:3002$p\"); echo \"$code $p\"; done; echo \"--- port 3002 owner ---\"; lsof -nP -iTCP:3002 -sTCP:LISTEN 2>/dev/null | tail -1)",
+      "Shell(which agent-browser 2>&1; agent-browser --version 2>&1 | head -3)",
+      "Shell(agent-browser:*)",
+      "Shell(sleep:*)",
+      "Shell(echo:*)",
+      "Shell(git add -A && git commit -q -F - <<'EOF' fix: keep store subscription alive under React StrictMode StoreHydrator used a `started` ref guard, so StrictMode's double-invoked effect unsubscribed during cleanup and the guarded second run never re-subscribed. As a result nothing was written to localStorage and data was lost on a full page load. Drop the guard so the effect is idempotent and the write subscription is always re-established. Found through browser verification (onboarding persisted in memory but vanished after navigation). Co-authored-by: CommandCodeBot <noreply@commandcode.ai> EOF GIT_TERMINAL_PROMPT=0 git push origin main 2>&1 | tail -3; git log --oneline -1)"
     ],
     "deny": [],
     "defaultMode": "default"

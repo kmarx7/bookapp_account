@@ -1,17 +1,12 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { useAppStore } from "@/store/useAppStore";
 import { readRaw, writeRaw } from "@/lib/storage/storage";
 import { migrate, toAppData } from "@/lib/storage/schema";
 
 export function StoreHydrator({ children }: { children: React.ReactNode }) {
-  const started = useRef(false);
-
   useEffect(() => {
-    if (started.current) return;
-    started.current = true;
-
     const raw = readRaw();
     if (raw) {
       try {
@@ -19,24 +14,19 @@ export function StoreHydrator({ children }: { children: React.ReactNode }) {
           schemaVersion?: number;
           data?: unknown;
         };
-        const data = migrate(
-          parsed.schemaVersion ?? 0,
-          parsed.data ?? parsed,
-        );
+        const data = migrate(parsed.schemaVersion ?? 0, parsed.data ?? parsed);
         useAppStore.getState().hydrate(data);
       } catch {
-        useAppStore.getState().hydrate(useAppStore.getState());
+        useAppStore.setState({ hydrated: true });
       }
     } else {
       useAppStore.setState({ hydrated: true });
     }
 
-    const unsubscribe = useAppStore.subscribe((state) => {
+    return useAppStore.subscribe((state) => {
       if (!state.hydrated) return;
       writeRaw(JSON.stringify(toAppData(state)));
     });
-
-    return unsubscribe;
   }, []);
 
   return <>{children}</>;
