@@ -35,7 +35,13 @@
       "Shell(agent-browser:*)",
       "Shell(sleep:*)",
       "Shell(echo:*)",
-      "Shell(git add -A && git commit -q -F - <<'EOF' fix: keep store subscription alive under React StrictMode StoreHydrator used a `started` ref guard, so StrictMode's double-invoked effect unsubscribed during cleanup and the guarded second run never re-subscribed. As a result nothing was written to localStorage and data was lost on a full page load. Drop the guard so the effect is idempotent and the write subscription is always re-established. Found through browser verification (onboarding persisted in memory but vanished after navigation). Co-authored-by: CommandCodeBot <noreply@commandcode.ai> EOF GIT_TERMINAL_PROMPT=0 git push origin main 2>&1 | tail -3; git log --oneline -1)"
+      "Shell(git add -A && git commit -q -F - <<'EOF' fix: keep store subscription alive under React StrictMode StoreHydrator used a `started` ref guard, so StrictMode's double-invoked effect unsubscribed during cleanup and the guarded second run never re-subscribed. As a result nothing was written to localStorage and data was lost on a full page load. Drop the guard so the effect is idempotent and the write subscription is always re-established. Found through browser verification (onboarding persisted in memory but vanished after navigation). Co-authored-by: CommandCodeBot <noreply@commandcode.ai> EOF GIT_TERMINAL_PROMPT=0 git push origin main 2>&1 | tail -3; git log --oneline -1)",
+      "Shell(node -e try{console.log('sharp:',require.resolve('sharp'))}catch(e){console.log('sharp: NOT AVAILABLE')})",
+      "Shell(node -e try{require.resolve('next/og');console.log('next/og: ok')}catch(e){console.log('next/og: missing')})",
+      "Shell(node /private/tmp/commandcode-501/-Users-kapital-Documents-01-Kmarx-PROJECT-02-AI-PROJECT-00-bookapp-acount/446b6ec0-a09c-42f0-831b-d18e51169c6a/scratchpad/gen-icons.mjs)",
+      "Shell(node .gen-icons.mjs)",
+      "Shell(for p in /manifest.webmanifest /sw.js /icons/icon-192.png /icons/icon-512.png /icons/maskable-512.png /icons/apple-icon.png; do echo \"$(curl -s --retry 8 --retry-delay 1 --retry-connrefused -o /dev/null -w '%{http_code} %{content_type}' \"http://localhost:3002$p\") $p\"; done; echo \"--- manifest body ---\"; curl -s http://localhost:3002/manifest.webmanifest | head -c 300; echo; echo \"--- head meta ---\"; curl -s http://localhost:3002/ | grep -oE '<link rel=\"[^\"]*\"[^>]*(manifest|icon|apple)[^>]*>' | head -6)",
+      "Shell(curl -s -o /dev/null -w %{http_code}\\n --max-time 3 http://localhost:3002/)"
     ],
     "deny": [],
     "defaultMode": "default"

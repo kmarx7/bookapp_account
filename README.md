@@ -12,10 +12,14 @@
 - **연간 자기자본 추적** — 연도별 입력 → 증가율, 차트, 감사의견 + 전자서명
 - **도구함** — 손익분기점 계산기, 명세서 감사, 고정비 결산, 지출 감정평가
 - **데이터 백업** — JSON 내보내기/불러오기
+- **PWA** — 홈 화면 설치, service worker 기반 오프라인 캐시, 전용 앱 아이콘
 
 ## 기술 스택
 
 Next.js (App Router) · TypeScript · Tailwind CSS v4 · Zustand · Recharts · Lucide React
+
+PWA는 Next 내장 `app/manifest.ts` + `public/sw.js` service worker로 구성한다.
+service worker는 프로덕션 빌드에서만 등록된다(`npm run build && npm start`).
 
 데이터는 브라우저 LocalStorage에만 저장된다(오프라인 우선, 백엔드/로그인 없음).
 자동 계산 필드는 저장하지 않고 순수 함수로 파생한다.

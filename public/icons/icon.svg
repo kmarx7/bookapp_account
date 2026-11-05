@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="내가 대표">
+  <rect width="512" height="512" rx="116" fill="#1b2a4a"/>
+  <rect x="112" y="300" width="64" height="100" rx="18" fill="#ffffff" opacity="0.72"/>
+  <rect x="224" y="248" width="64" height="152" rx="18" fill="#ffffff" opacity="0.88"/>
+  <rect x="336" y="196" width="64" height="204" rx="18" fill="#ffffff"/>
+  <path d="M124 148 L232 96 L312 132 L396 76" fill="none" stroke="#4ade80" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

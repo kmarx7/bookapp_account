@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/Badge";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { MonthSwitcher } from "@/components/ui/MonthSwitcher";
 import { Gauge } from "@/components/ui/Gauge";
+import { InstallPrompt } from "@/components/pwa/InstallPrompt";
 import { useSelectedMonth } from "@/hooks/useSelectedMonth";
 import { useAppStore } from "@/store/useAppStore";
 import { calcBalanceSheet } from "@/lib/calculations/balanceSheet";
@@ -161,6 +162,8 @@ export default function HomePage() {
               : "재무상태표를 작성하면 비율이 표시됩니다."}
           </p>
         </Card>
+
+        <InstallPrompt />
       </div>
 
       <Link
