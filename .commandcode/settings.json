@@ -26,7 +26,11 @@
       "Shell(node -e const p=require('recharts/package.json');console.log(p.version))",
       "Shell(npx next start -p 3123)",
       "Shell(for p in / /onboarding /income /balance-sheet /cash-flow /debts /annual /tools /tools/bep /tools/payslip /tools/fixed-costs /tools/expense-review /settings /more; do code=$(curl -s -o /dev/null -w \"%{http_code}\" \"http://localhost:3123$p\"); echo \"$code $p\"; done; echo \"--- home contains ---\"; curl -s http://localhost:3123/ | grep -o '내가 대표\\|불러오는 중' | head -3)",
-      "Shell(NODE_ENV=development npm uninstall react-hook-form 2>&1 | tail -5; echo \"--- verify devDeps still installed ---\"; ls -d node_modules/vitest node_modules/typescript node_modules/eslint node_modules/tailwindcss 2>&1; echo \"--- react-hook-form gone? ---\"; ls -d node_modules/react-hook-form 2>&1)"
+      "Shell(NODE_ENV=development npm uninstall react-hook-form 2>&1 | tail -5; echo \"--- verify devDeps still installed ---\"; ls -d node_modules/vitest node_modules/typescript node_modules/eslint node_modules/tailwindcss 2>&1; echo \"--- react-hook-form gone? ---\"; ls -d node_modules/react-hook-form 2>&1)",
+      "Shell(lsof:*)",
+      "Shell(awk:*)",
+      "Shell(for pid in 95915 29181 40059; do echo \"=== PID $pid ===\"; ps -p $pid -o pid=,ppid=,command= 2>/dev/null; echo -n \"cwd: \"; lsof -a -p $pid -d cwd -Fn 2>/dev/null | grep '^n' | cut -c2-; done; echo \"=== my old test port 3123 ===\"; lsof -nP -iTCP:3123 -sTCP:LISTEN 2>/dev/null || echo \"3123 free\"; echo \"=== port 3002 ===\"; lsof -nP -iTCP:3002 -sTCP:LISTEN 2>/dev/null || echo \"3002 free\")",
+      "Shell(for p in / /income /annual; do code=$(curl -s -o /dev/null -w \"%{http_code}\" \"http://localhost:3002$p\"); echo \"$code $p\"; done; echo \"--- port 3002 owner ---\"; lsof -nP -iTCP:3002 -sTCP:LISTEN 2>/dev/null | tail -1)"
     ],
     "deny": [],
     "defaultMode": "default"

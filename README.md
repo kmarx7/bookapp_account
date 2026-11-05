@@ -27,7 +27,7 @@ npm install
 npm run dev
 ```
 
-[http://localhost:3000](http://localhost:3000) 에서 확인.
+[http://localhost:3002](http://localhost:3002) 에서 확인. (3000/3001은 다른 프로젝트가 사용 중이라 dev/start 포트를 3002로 고정했다.)
 
 ## 스크립트
 
