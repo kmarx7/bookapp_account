@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { Plus, ChevronRight } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, CardTitle } from "@/components/ui/Card";
 import { StatBlock, toneForValue } from "@/components/ui/StatBlock";
@@ -10,6 +10,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { MonthSwitcher } from "@/components/ui/MonthSwitcher";
 import { Gauge } from "@/components/ui/Gauge";
 import { InstallPrompt } from "@/components/pwa/InstallPrompt";
+import { courseStats } from "@/lib/course";
 import { useSelectedMonth } from "@/hooks/useSelectedMonth";
 import { useAppStore } from "@/store/useAppStore";
 import { calcBalanceSheet } from "@/lib/calculations/balanceSheet";
@@ -31,6 +32,7 @@ export default function HomePage() {
   );
   const incomeStatements = useAppStore((state) => state.incomeStatements);
   const cashFlows = useAppStore((state) => state.cashFlows);
+  const learn = courseStats(useAppStore());
 
   const incomeComputed = income ? calcIncomeStatement(income) : null;
   const balanceComputed = balanceSheet ? calcBalanceSheet(balanceSheet) : null;
@@ -55,6 +57,26 @@ export default function HomePage() {
       </div>
 
       <div className="flex flex-col gap-4">
+        <Card>
+          <CardTitle hint={`${learn.done} / ${learn.total} 완료`}>학습 코스</CardTitle>
+          <Gauge ratio={learn.ratio} label="코스 진행" />
+          {learn.next ? (
+            <Link
+              href={`/learn/${learn.next.id}`}
+              className="mt-4 flex items-center justify-between rounded-xl bg-brand-soft px-4 py-3 transition-colors hover:bg-border"
+            >
+              <span className="text-sm font-medium text-brand">
+                다음 실습 · {learn.next.title}
+              </span>
+              <ChevronRight size={18} className="text-brand" />
+            </Link>
+          ) : (
+            <p className="mt-4 text-sm text-positive">
+              17개 실습을 모두 완료했습니다.
+            </p>
+          )}
+        </Card>
+
         <Card>
           <CardTitle hint="손익계산서">이번 달 요약</CardTitle>
           {incomeComputed ? (

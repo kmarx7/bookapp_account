@@ -121,6 +121,11 @@ export interface AnnualTracking {
   updatedAt: string;
 }
 
+export interface CourseProgress {
+  completedSteps: string[];
+  updatedAt: string;
+}
+
 export interface AppData {
   schemaVersion: number;
   user: User | null;
@@ -129,6 +134,7 @@ export interface AppData {
   cashFlows: CashFlow[];
   debts: Debt[];
   annualTrackings: AnnualTracking[];
+  courseProgress: CourseProgress;
 }
 
 export interface PayslipItem {

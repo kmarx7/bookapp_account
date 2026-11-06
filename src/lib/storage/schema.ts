@@ -9,6 +9,7 @@ export const DEFAULT_APP_DATA: AppData = {
   cashFlows: [],
   debts: [],
   annualTrackings: [],
+  courseProgress: { completedSteps: [], updatedAt: "" },
 };
 
 export function migrate(persistedVersion: number, persisted: unknown): AppData {
@@ -26,6 +27,7 @@ export function toAppData(source: AppData): AppData {
     cashFlows: source.cashFlows,
     debts: source.debts,
     annualTrackings: source.annualTrackings,
+    courseProgress: source.courseProgress,
   };
 }
 
@@ -38,6 +40,7 @@ export function normalize(source: Partial<AppData>): AppData {
     cashFlows: source.cashFlows ?? [],
     debts: source.debts ?? [],
     annualTrackings: source.annualTrackings ?? [],
+    courseProgress: source.courseProgress ?? { completedSteps: [], updatedAt: "" },
   };
 }
 
@@ -54,5 +57,8 @@ function stampMissingTimestamps(data: AppData): AppData {
     user: data.user ? legacy(data.user) : null,
     debts: data.debts.map(legacy),
     annualTrackings: data.annualTrackings.map(legacy),
+    courseProgress: data.courseProgress.updatedAt
+      ? data.courseProgress
+      : { ...data.courseProgress, updatedAt: stamp },
   };
 }

@@ -28,6 +28,7 @@ export function mergeAppData(local: AppData, remote: AppData): AppData {
     cashFlows: mergeCollection(local.cashFlows, remote.cashFlows),
     debts: mergeCollection(local.debts, remote.debts),
     annualTrackings: mergeCollection(local.annualTrackings, remote.annualTrackings),
+    courseProgress: mergeCourseProgress(local, remote),
   };
 }
 
@@ -35,4 +36,18 @@ function mergeUser(local: AppData, remote: AppData) {
   if (!local.user) return remote.user;
   if (!remote.user) return local.user;
   return newer(local.user, remote.user);
+}
+
+function mergeCourseProgress(local: AppData, remote: AppData) {
+  const completedSteps = [
+    ...new Set([
+      ...local.courseProgress.completedSteps,
+      ...remote.courseProgress.completedSteps,
+    ]),
+  ];
+  const updatedAt =
+    local.courseProgress.updatedAt > remote.courseProgress.updatedAt
+      ? local.courseProgress.updatedAt
+      : remote.courseProgress.updatedAt;
+  return { completedSteps, updatedAt };
 }

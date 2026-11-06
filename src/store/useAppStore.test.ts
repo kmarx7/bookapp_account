@@ -59,6 +59,7 @@ describe("useAppStore", () => {
       "annualTrackings",
       "balanceSheets",
       "cashFlows",
+      "courseProgress",
       "debts",
       "incomeStatements",
       "schemaVersion",

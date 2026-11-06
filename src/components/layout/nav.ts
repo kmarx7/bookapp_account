@@ -1,4 +1,5 @@
 import {
+  BookOpen,
   Home,
   LineChart,
   MoreHorizontal,
@@ -20,6 +21,7 @@ export interface NavItem {
 
 export const NAV_ITEMS: NavItem[] = [
   { href: "/", label: "홈", shortLabel: "홈", icon: Home },
+  { href: "/learn", label: "학습 코스", shortLabel: "코스", icon: BookOpen },
   { href: "/income", label: "월간 손익계산서", shortLabel: "손익", icon: LineChart },
   { href: "/balance-sheet", label: "재무상태표", shortLabel: "재무상태", icon: Scale },
   { href: "/cash-flow", label: "월간 현금흐름표", shortLabel: "현금흐름", icon: Waves },

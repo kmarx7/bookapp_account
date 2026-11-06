@@ -24,6 +24,8 @@ export interface AppState extends AppData {
   removeDebt: (id: string) => void;
   upsertAnnual: (value: AnnualTracking) => void;
   updateAnnual: (id: string, patch: Partial<AnnualTracking>) => void;
+  setStepComplete: (id: string, complete: boolean) => void;
+  resetCourse: () => void;
   importData: (data: AppData) => void;
   resetAll: () => void;
 }
@@ -105,6 +107,22 @@ export const useAppStore = create<AppState>((set, get) => ({
         row.id === id ? { ...row, ...patch, updatedAt: now() } : row,
       ),
     })),
+
+  setStepComplete: (id, complete) =>
+    set((state) => {
+      const steps = new Set(state.courseProgress.completedSteps);
+      if (complete) steps.add(id);
+      else steps.delete(id);
+      return {
+        courseProgress: {
+          completedSteps: [...steps],
+          updatedAt: now(),
+        },
+      };
+    }),
+
+  resetCourse: () =>
+    set({ courseProgress: { completedSteps: [], updatedAt: now() } }),
 
   importData: (data) => set({ ...data, hydrated: true }),
 
