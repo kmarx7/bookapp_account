@@ -13,7 +13,7 @@ import { DEFAULT_APP_DATA } from "@/lib/storage/schema";
 export interface AppState extends AppData {
   hydrated: boolean;
   hydrate: (data: AppData) => void;
-  setUser: (user: User) => void;
+  setUser: (user: Omit<User, "updatedAt">) => void;
   updateUser: (patch: Partial<User>) => void;
   upsertIncomeStatement: (value: IncomeStatement) => void;
   upsertCashFlow: (value: CashFlow) => void;
@@ -27,6 +27,8 @@ export interface AppState extends AppData {
   importData: (data: AppData) => void;
   resetAll: () => void;
 }
+
+const now = () => new Date().toISOString();
 
 function upsertById<T extends { id: string }>(list: T[], value: T): T[] {
   const index = list.findIndex((item) => item.id === value.id);
@@ -42,36 +44,47 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   hydrate: (data) => set({ ...data, hydrated: true }),
 
-  setUser: (user) => set({ user }),
+  setUser: (user) => set({ user: { ...user, updatedAt: now() } }),
 
   updateUser: (patch) => {
     const current = get().user;
     if (!current) return;
-    set({ user: { ...current, ...patch } });
+    set({ user: { ...current, ...patch, updatedAt: now() } });
   },
 
   upsertIncomeStatement: (value) =>
     set((state) => ({
-      incomeStatements: upsertById(state.incomeStatements, value),
+      incomeStatements: upsertById(state.incomeStatements, {
+        ...value,
+        updatedAt: now(),
+      }),
     })),
 
   upsertCashFlow: (value) =>
-    set((state) => ({ cashFlows: upsertById(state.cashFlows, value) })),
+    set((state) => ({
+      cashFlows: upsertById(state.cashFlows, { ...value, updatedAt: now() }),
+    })),
 
   upsertBalanceSheet: (value) =>
-    set((state) => ({ balanceSheets: upsertById(state.balanceSheets, value) })),
+    set((state) => ({
+      balanceSheets: upsertById(state.balanceSheets, {
+        ...value,
+        updatedAt: now(),
+      }),
+    })),
 
   removeBalanceSheet: (id) =>
     set((state) => ({
       balanceSheets: state.balanceSheets.filter((sheet) => sheet.id !== id),
     })),
 
-  addDebt: (value) => set((state) => ({ debts: [...state.debts, value] })),
+  addDebt: (value) =>
+    set((state) => ({ debts: [...state.debts, { ...value, updatedAt: now() }] })),
 
   updateDebt: (id, patch) =>
     set((state) => ({
       debts: state.debts.map((debt) =>
-        debt.id === id ? { ...debt, ...patch } : debt,
+        debt.id === id ? { ...debt, ...patch, updatedAt: now() } : debt,
       ),
     })),
 
@@ -80,13 +93,16 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   upsertAnnual: (value) =>
     set((state) => ({
-      annualTrackings: upsertById(state.annualTrackings, value),
+      annualTrackings: upsertById(state.annualTrackings, {
+        ...value,
+        updatedAt: now(),
+      }),
     })),
 
   updateAnnual: (id, patch) =>
     set((state) => ({
       annualTrackings: state.annualTrackings.map((row) =>
-        row.id === id ? { ...row, ...patch } : row,
+        row.id === id ? { ...row, ...patch, updatedAt: now() } : row,
       ),
     })),
 

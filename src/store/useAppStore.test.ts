@@ -9,6 +9,7 @@ const user: User = {
   nickname: "이모 대표",
   foundedAt: "2026-01-01",
   createdAt: "2026-01-01T00:00:00.000Z",
+  updatedAt: "2026-01-01T00:00:00.000Z",
 };
 
 beforeEach(() => {
@@ -42,6 +43,7 @@ describe("useAppStore", () => {
       balance: 1_000,
       annualRate: 5,
       monthlyPayment: 100,
+      updatedAt: "2026-01-01T00:00:00.000Z",
     };
     useAppStore.getState().addDebt(debt);
     useAppStore.getState().updateDebt("d1", { balance: 500 });

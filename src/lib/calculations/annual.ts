@@ -41,5 +41,6 @@ export function createAnnualTracking(
     totalAssets: 0,
     totalDebts: 0,
     auditOpinion: null,
+    updatedAt: new Date().toISOString(),
   };
 }

@@ -9,6 +9,7 @@ const debt = (overrides: Partial<Debt>): Debt => ({
   balance: overrides.balance ?? 1_000_000,
   annualRate: overrides.annualRate ?? 12,
   monthlyPayment: overrides.monthlyPayment ?? 100_000,
+  updatedAt: "2026-01-01T00:00:00.000Z",
 });
 
 describe("sortDebtsByRate", () => {

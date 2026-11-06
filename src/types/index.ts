@@ -5,6 +5,7 @@ export interface User {
   nickname: string;
   foundedAt: string;
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface FixedCosts {
@@ -105,6 +106,7 @@ export interface Debt {
   annualRate: number;
   monthlyPayment: number;
   strategy?: string;
+  updatedAt: string;
 }
 
 export interface AnnualTracking {
@@ -116,6 +118,7 @@ export interface AnnualTracking {
   auditOpinion: AuditOpinion | null;
   signature?: string;
   signedAt?: string;
+  updatedAt: string;
 }
 
 export interface AppData {

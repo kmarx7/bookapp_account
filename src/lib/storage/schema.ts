@@ -12,14 +12,9 @@ export const DEFAULT_APP_DATA: AppData = {
 };
 
 export function migrate(persistedVersion: number, persisted: unknown): AppData {
-  const source = (persisted ?? {}) as Partial<AppData>;
-
-  switch (persistedVersion) {
-    case 0:
-    case SCHEMA_VERSION:
-    default:
-      return normalize(source);
-  }
+  const normalized = normalize((persisted ?? {}) as Partial<AppData>);
+  if (persistedVersion >= SCHEMA_VERSION) return normalized;
+  return stampMissingTimestamps(normalized);
 }
 
 export function toAppData(source: AppData): AppData {
@@ -43,5 +38,21 @@ export function normalize(source: Partial<AppData>): AppData {
     cashFlows: source.cashFlows ?? [],
     debts: source.debts ?? [],
     annualTrackings: source.annualTrackings ?? [],
+  };
+}
+
+function stampMissingTimestamps(data: AppData): AppData {
+  const stamp = new Date().toISOString();
+  const legacy = <T extends { updatedAt?: string }>(item: T): T => ({
+    ...item,
+    updatedAt: item.updatedAt ?? stamp,
+  });
+
+  return {
+    ...data,
+    schemaVersion: SCHEMA_VERSION,
+    user: data.user ? legacy(data.user) : null,
+    debts: data.debts.map(legacy),
+    annualTrackings: data.annualTrackings.map(legacy),
   };
 }

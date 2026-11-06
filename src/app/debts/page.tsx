@@ -23,6 +23,7 @@ function blankDebt(userId: string): Debt {
     balance: 0,
     annualRate: 0,
     monthlyPayment: 0,
+    updatedAt: new Date().toISOString(),
   };
 }
 
