@@ -177,6 +177,7 @@ export default function IncomePage() {
         <Card className="mt-4">
           <CardTitle hint="고정비 · 변동비 · 투자비">비용 구조</CardTitle>
           <CompositionDonut
+            title="비용 구조"
             total={computed.totalExpenses}
             data={[
               { name: "고정비", value: computed.fixedTotal, color: "#1b2a4a" },

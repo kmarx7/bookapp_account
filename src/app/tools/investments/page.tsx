@@ -73,7 +73,7 @@ export default function InvestmentsPage() {
                     <button
                       type="button"
                       onClick={() => removeItem(item.id)}
-                      className="rounded-lg p-2 text-muted transition-colors hover:bg-negative-soft hover:text-negative"
+                      className="inline-flex min-h-8 min-w-8 items-center justify-center rounded-lg p-2 text-muted transition-colors hover:bg-negative-soft hover:text-negative"
                       aria-label="삭제"
                     >
                       <Trash2 size={16} />

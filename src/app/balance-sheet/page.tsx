@@ -210,6 +210,7 @@ export default function BalanceSheetPage() {
         <Card className="mt-4">
           <CardTitle hint="유동자산 · 고정자산">자산 구성</CardTitle>
           <CompositionDonut
+            title="자산 구성"
             total={computed.totalAssets}
             data={[
               { name: "유동자산", value: computed.totalCurrentAssets, color: "#1b2a4a" },

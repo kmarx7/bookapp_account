@@ -50,3 +50,15 @@ summary:focus-visible {
     font-size: 16px;
   }
 }
+
+/* OS에서 "동작 줄이기"를 켠 경우 전환·애니메이션을 사실상 제거한다. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

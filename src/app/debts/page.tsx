@@ -94,7 +94,7 @@ export default function DebtsPage() {
                       <button
                         type="button"
                         onClick={() => removeDebt(debt.id)}
-                        className="rounded-lg p-1.5 text-muted transition-colors hover:bg-negative-soft hover:text-negative"
+                        className="inline-flex min-h-8 min-w-8 items-center justify-center rounded-lg p-1.5 text-muted transition-colors hover:bg-negative-soft hover:text-negative"
                         aria-label="삭제"
                       >
                         <Trash2 size={16} />
