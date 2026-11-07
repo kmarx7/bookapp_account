@@ -9,6 +9,7 @@ import { FieldGroup, FieldRow } from "@/components/forms/FieldRow";
 import { CurrencyInput } from "@/components/forms/CurrencyInput";
 import { Sheet, SheetGroup, SheetRow } from "@/components/statement/Sheet";
 import { ViewTabs, type SheetView } from "@/components/statement/ViewTabs";
+import { CashFlowBar } from "@/components/charts/CashFlowBar";
 import { useSelectedMonth } from "@/hooks/useSelectedMonth";
 import { useAppStore } from "@/store/useAppStore";
 import { calcCashFlow, createCashFlow } from "@/lib/calculations/cashFlow";
@@ -69,6 +70,7 @@ export default function CashFlowPage() {
       <ViewTabs view={view} onChange={setView} />
 
       {view === "input" ? (
+        <>
         <div className="grid gap-4 lg:grid-cols-2">
           <Card>
             <CardTitle>입력</CardTitle>
@@ -111,6 +113,17 @@ export default function CashFlowPage() {
             </div>
           </Card>
         </div>
+        <Card className="mt-4">
+          <CardTitle hint="영업 · 투자 · 재무">활동별 순현금흐름</CardTitle>
+          <CashFlowBar
+            data={[
+              { name: "영업", value: computed.opNet },
+              { name: "투자", value: computed.invNet },
+              { name: "재무", value: computed.finNet },
+            ]}
+          />
+        </Card>
+        </>
       ) : (
         <Sheet
           title="월간 현금흐름표"

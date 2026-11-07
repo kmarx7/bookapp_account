@@ -7,6 +7,13 @@ export function formatNumber(value: number): string {
   return Math.round(value || 0).toLocaleString("ko-KR");
 }
 
+export function formatCompactKRW(value: number): string {
+  const amount = Math.round(value || 0);
+  if (Math.abs(amount) >= 100_000_000) return `${(amount / 100_000_000).toFixed(1)}억`;
+  if (Math.abs(amount) >= 10_000) return `${Math.round(amount / 10_000)}만`;
+  return String(amount);
+}
+
 export function formatPercent(value: number, digits = 1): string {
   if (!Number.isFinite(value)) return "-";
   return `${(value * 100).toFixed(digits)}%`;

@@ -9,6 +9,7 @@ import { FieldGroup, FieldRow } from "@/components/forms/FieldRow";
 import { CurrencyInput } from "@/components/forms/CurrencyInput";
 import { Sheet, SheetGroup, SheetRow } from "@/components/statement/Sheet";
 import { ViewTabs, type SheetView } from "@/components/statement/ViewTabs";
+import { CompositionDonut } from "@/components/charts/CompositionDonut";
 import { useSelectedMonth } from "@/hooks/useSelectedMonth";
 import { useAppStore } from "@/store/useAppStore";
 import {
@@ -58,6 +59,7 @@ export default function IncomePage() {
       <ViewTabs view={view} onChange={setView} />
 
       {view === "input" ? (
+        <>
         <div className="grid gap-4 lg:grid-cols-2">
           <Card>
             <CardTitle>입력</CardTitle>
@@ -172,6 +174,18 @@ export default function IncomePage() {
             </div>
           </Card>
         </div>
+        <Card className="mt-4">
+          <CardTitle hint="고정비 · 변동비 · 투자비">비용 구조</CardTitle>
+          <CompositionDonut
+            total={computed.totalExpenses}
+            data={[
+              { name: "고정비", value: computed.fixedTotal, color: "#1b2a4a" },
+              { name: "변동비", value: computed.variableTotal, color: "#4b6a9b" },
+              { name: "투자비", value: computed.investmentTotal, color: "#15803d" },
+            ]}
+          />
+        </Card>
+        </>
       ) : (
         <Sheet
           title="월간 손익계산서"

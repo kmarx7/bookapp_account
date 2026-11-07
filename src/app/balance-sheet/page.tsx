@@ -12,6 +12,7 @@ import { FieldGroup, FieldRow } from "@/components/forms/FieldRow";
 import { CurrencyInput } from "@/components/forms/CurrencyInput";
 import { Sheet, SheetGroup, SheetRow } from "@/components/statement/Sheet";
 import { ViewTabs, type SheetView } from "@/components/statement/ViewTabs";
+import { CompositionDonut } from "@/components/charts/CompositionDonut";
 import { useAppStore } from "@/store/useAppStore";
 import {
   calcBalanceSheet,
@@ -118,6 +119,7 @@ export default function BalanceSheetPage() {
       <ViewTabs view={view} onChange={setView} />
 
       {view === "input" ? (
+        <>
         <div className="grid gap-4 lg:grid-cols-2">
           <Card>
             <CardTitle hint="입력">자산 / 부채</CardTitle>
@@ -205,6 +207,17 @@ export default function BalanceSheetPage() {
             </div>
           </Card>
         </div>
+        <Card className="mt-4">
+          <CardTitle hint="유동자산 · 고정자산">자산 구성</CardTitle>
+          <CompositionDonut
+            total={computed.totalAssets}
+            data={[
+              { name: "유동자산", value: computed.totalCurrentAssets, color: "#1b2a4a" },
+              { name: "고정자산", value: computed.totalFixedAssets, color: "#4b6a9b" },
+            ]}
+          />
+        </Card>
+        </>
       ) : (
         <Sheet
           title="재무상태표"

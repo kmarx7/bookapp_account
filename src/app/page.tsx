@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import Link from "next/link";
 import { Plus, ChevronRight } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -11,6 +12,7 @@ import { MonthSwitcher } from "@/components/ui/MonthSwitcher";
 import { Gauge } from "@/components/ui/Gauge";
 import { InstallPrompt } from "@/components/pwa/InstallPrompt";
 import { courseStats } from "@/lib/course";
+import { MonthlyTrendChart } from "@/components/charts/MonthlyTrendChart";
 import { useSelectedMonth } from "@/hooks/useSelectedMonth";
 import { useAppStore } from "@/store/useAppStore";
 import { calcBalanceSheet } from "@/lib/calculations/balanceSheet";
@@ -33,6 +35,24 @@ export default function HomePage() {
   const incomeStatements = useAppStore((state) => state.incomeStatements);
   const cashFlows = useAppStore((state) => state.cashFlows);
   const learn = courseStats(useAppStore());
+
+  const trend = useMemo(() => {
+    const base = new Date();
+    return Array.from({ length: 6 }, (_, index) => {
+      const date = new Date(base.getFullYear(), base.getMonth() - 5 + index, 1);
+      const y = date.getFullYear();
+      const m = date.getMonth() + 1;
+      const record = incomeStatements.find(
+        (item) => item.year === y && item.month === m,
+      );
+      const computedIncome = record ? calcIncomeStatement(record) : null;
+      return {
+        label: `${m}월`,
+        gross: computedIncome?.grossProfit ?? 0,
+        expense: computedIncome?.totalExpenses ?? 0,
+      };
+    });
+  }, [incomeStatements]);
 
   const incomeComputed = income ? calcIncomeStatement(income) : null;
   const balanceComputed = balanceSheet ? calcBalanceSheet(balanceSheet) : null;
@@ -103,6 +123,11 @@ export default function HomePage() {
               }
             />
           )}
+        </Card>
+
+        <Card>
+          <CardTitle hint="최근 6개월">손익 추이</CardTitle>
+          <MonthlyTrendChart data={trend} />
         </Card>
 
         <Card>
