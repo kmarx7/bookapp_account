@@ -1,15 +1,25 @@
 "use client";
 
-import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
-import { ChartFigure } from "@/components/charts/ChartFigure";
-import { useReducedMotion } from "@/hooks/useReducedMotion";
+import dynamic from "next/dynamic";
+import type { ComponentProps } from "react";
 import { formatKRW, formatPercent } from "@/lib/format";
+import type { CompositionSlice } from "@/components/charts/CompositionPie";
 
-export interface CompositionSlice {
-  name: string;
-  value: number;
-  color: string;
-}
+export type { CompositionSlice };
+
+/**
+ * CompositionDonut은 목록(범례)을 즉시 그리고 도넛만 동적 import 한다.
+ * recharts는 이 동적 청크에만 존재하므로 라우트 프리페치에 실려 나가지 않는다.
+ */
+const LazyCompositionPie = dynamic(
+  () => import("@/components/charts/CompositionPie").then((mod) => mod.CompositionPie),
+  {
+    ssr: false,
+    loading: () => <div className="h-full w-full" aria-hidden="true" />,
+  },
+);
+
+type PieProps = ComponentProps<typeof LazyCompositionPie>;
 
 export function CompositionDonut({
   data,
@@ -22,7 +32,6 @@ export function CompositionDonut({
   title?: string;
   emptyLabel?: string;
 }) {
-  const reduced = useReducedMotion();
   const slices = data.filter((slice) => (slice.value || 0) > 0);
 
   if (total <= 0 || slices.length === 0) {
@@ -40,31 +49,19 @@ export function CompositionDonut({
     )
     .join(" / ");
 
+  const pieProps: PieProps = { slices };
+
   return (
     <div className="flex flex-col items-center gap-5 sm:flex-row">
-      <ChartFigure title={title} description={description}>
-        <div className="h-44 w-44 shrink-0">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={slices}
-                dataKey="value"
-                nameKey="name"
-                innerRadius={52}
-                outerRadius={80}
-                paddingAngle={2}
-                stroke="none"
-                isAnimationActive={!reduced}
-              >
-                {slices.map((slice) => (
-                  <Cell key={slice.name} fill={slice.color} />
-                ))}
-              </Pie>
-              <Tooltip formatter={(value) => formatKRW(Number(value))} />
-            </PieChart>
-          </ResponsiveContainer>
+      <figure
+        className="m-0 h-44 w-44 shrink-0"
+        role="img"
+        aria-label={`${title}. ${description}`}
+      >
+        <div aria-hidden="true" className="h-full w-full">
+          <LazyCompositionPie {...pieProps} />
         </div>
-      </ChartFigure>
+      </figure>
       <ul className="flex w-full flex-col gap-2">
         {slices.map((slice) => (
           <li key={slice.name} className="flex items-center justify-between gap-2 text-sm">

@@ -12,7 +12,7 @@ import { MonthSwitcher } from "@/components/ui/MonthSwitcher";
 import { Gauge } from "@/components/ui/Gauge";
 import { InstallPrompt } from "@/components/pwa/InstallPrompt";
 import { courseStats } from "@/lib/course";
-import { MonthlyTrendChart } from "@/components/charts/MonthlyTrendChart";
+import { LazyMonthlyTrendChart as MonthlyTrendChart } from "@/components/charts/lazy";
 import { useSelectedMonth } from "@/hooks/useSelectedMonth";
 import { useAppStore } from "@/store/useAppStore";
 import { calcBalanceSheet } from "@/lib/calculations/balanceSheet";

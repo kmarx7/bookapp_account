@@ -9,7 +9,7 @@ import { FieldGroup, FieldRow } from "@/components/forms/FieldRow";
 import { CurrencyInput } from "@/components/forms/CurrencyInput";
 import { Sheet, SheetGroup, SheetRow } from "@/components/statement/Sheet";
 import { ViewTabs, type SheetView } from "@/components/statement/ViewTabs";
-import { CashFlowBar } from "@/components/charts/CashFlowBar";
+import { LazyCashFlowBar as CashFlowBar } from "@/components/charts/lazy";
 import { useSelectedMonth } from "@/hooks/useSelectedMonth";
 import { useAppStore } from "@/store/useAppStore";
 import { calcCashFlow, createCashFlow } from "@/lib/calculations/cashFlow";

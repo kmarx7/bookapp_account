@@ -7,10 +7,10 @@ import { StatBlock } from "@/components/ui/StatBlock";
 import { Gauge } from "@/components/ui/Gauge";
 import { CurrencyInput } from "@/components/forms/CurrencyInput";
 import {
-  AssetDebtBarChart,
-  EquityLineChart,
-  EquityRatioChart,
-} from "@/components/charts/AnnualCharts";
+  LazyAssetDebtBarChart as AssetDebtBarChart,
+  LazyEquityLineChart as EquityLineChart,
+  LazyEquityRatioChart as EquityRatioChart,
+} from "@/components/charts/lazy";
 import { Sheet } from "@/components/statement/Sheet";
 import { ViewTabs, type SheetView } from "@/components/statement/ViewTabs";
 import { SignatureCanvas } from "@/components/signature/SignatureCanvas";
