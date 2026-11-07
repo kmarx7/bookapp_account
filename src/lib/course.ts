@@ -351,6 +351,8 @@ export const COURSE_STEPS: CourseStep[] = [
         "④ 보장료는 비용, 적립금은 자산으로 분리한다",
         "⑤ '비용으로 잡히는 월 보험료 합계'를 적는다",
       ],
+      target: "/tools/insurance",
+      targetLabel: "보험 회계 분류",
     },
   },
   {
@@ -373,8 +375,8 @@ export const COURSE_STEPS: CourseStep[] = [
         "④ 재무상태표의 투자자산에 현재 시가를 반영한다",
         "⑤ 투자 원칙 3가지를 적고 서명한다 (위반 시 그 달 투자 중단)",
       ],
-      target: "/balance-sheet",
-      targetLabel: "재무상태표에 반영",
+      target: "/tools/investments",
+      targetLabel: "투자 포트폴리오",
     },
   },
   {
@@ -397,6 +399,8 @@ export const COURSE_STEPS: CourseStep[] = [
         "④ 환급금 용처를 미리 결정한다 (소비/자산/부채)",
         "⑤ 영수증 수집 습관을 만든다 (스마트폰 별도 폴더)",
       ],
+      target: "/tools/tax-refund",
+      targetLabel: "연말정산 시뮬레이션",
     },
   },
   {

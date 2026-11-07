@@ -24,6 +24,21 @@ const TOOLS = [
     title: TOOL_NAMES.expenseReview,
     description: "지출을 비용·유지보수비·투자로 자동 분류해 비중을 봅니다.",
   },
+  {
+    href: "/tools/insurance",
+    title: TOOL_NAMES.insurance,
+    description: "보험료를 보장성(비용)과 저축성(자산)으로 나눠 월 비용을 계산합니다.",
+  },
+  {
+    href: "/tools/investments",
+    title: TOOL_NAMES.investments,
+    description: "매수 금액과 현재 시가로 평가손익을 계산하고 재무상태표에 반영합니다.",
+  },
+  {
+    href: "/tools/tax-refund",
+    title: TOOL_NAMES.taxRefund,
+    description: "연말정산 환급금을 자산·부채로 돌렸을 때 자기자본 변화를 봅니다.",
+  },
 ];
 
 export default function ToolsPage() {

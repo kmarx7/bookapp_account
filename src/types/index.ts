@@ -158,3 +158,19 @@ export interface ExpenseItem {
   amount: number;
   category: "cost" | "maintenance" | "investment";
 }
+
+export interface InsuranceItem {
+  id: string;
+  name: string;
+  monthlyPremium: number;
+  kind: "protection" | "savings" | "mixed";
+  savingsMonthly: number;
+  surrenderValue?: number;
+}
+
+export interface InvestmentItem {
+  id: string;
+  name: string;
+  cost: number;
+  marketValue: number;
+}

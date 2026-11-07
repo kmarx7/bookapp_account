@@ -7,3 +7,6 @@ export * from "@/lib/calculations/bep";
 export * from "@/lib/calculations/payslip";
 export * from "@/lib/calculations/fixedCosts";
 export * from "@/lib/calculations/expenseReview";
+export * from "@/lib/calculations/insurance";
+export * from "@/lib/calculations/investments";
+export * from "@/lib/calculations/taxRefund";

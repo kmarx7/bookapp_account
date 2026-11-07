@@ -96,6 +96,9 @@ export const TOOL_NAMES = {
   payslip: "명세서 감사 도구",
   fixedCosts: "고정비 결산",
   expenseReview: "지출 감정평가",
+  insurance: "보험 회계 분류",
+  investments: "투자 포트폴리오",
+  taxRefund: "연말정산 시뮬레이션",
 } as const;
 
 export const FIXED_COST_PERIOD_LABELS: Record<FixedCostItem["period"], string> = {
