@@ -29,7 +29,11 @@ export interface AppState extends AppData {
   resetCourse: () => void;
   updateTool: <K extends keyof ToolData>(key: K, value: ToolData[K]) => void;
   importData: (data: AppData) => void;
-  resetAll: () => void;
+  /**
+   * 재무·학습 데이터를 초기화한다. 대표 정보(user)는 유지한다.
+   * 프로필까지 지우면 온보딩으로 돌아가 백업 복원 전에 다시 설정해야 하는 함정이 생긴다.
+   */
+  resetFinancialData: () => void;
 }
 
 const now = () => new Date().toISOString();
@@ -133,7 +137,8 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   importData: (data) => set({ ...data, hydrated: true }),
 
-  resetAll: () => set({ ...createDefaultAppData(), hydrated: true }),
+  resetFinancialData: () =>
+    set((state) => ({ ...createDefaultAppData(), user: state.user, hydrated: true })),
 }));
 
 export function selectIncomeStatement(

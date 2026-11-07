@@ -45,7 +45,7 @@ beforeEach(() => {
   remote.eq.mockClear();
   remote.maybeSingle.mockReset();
   remote.upsert.mockReset();
-  useAppStore.getState().resetAll();
+  useAppStore.setState({ ...DEFAULT_APP_DATA, hydrated: true });
 });
 
 describe("pullRemote (로그인 직후 원격 조회)", () => {

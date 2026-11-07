@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { selectIncomeStatement, useAppStore } from "@/store/useAppStore";
 import { createIncomeStatement } from "@/lib/calculations/incomeStatement";
-import { toAppData } from "@/lib/storage/schema";
+import { createDefaultAppData, toAppData } from "@/lib/storage/schema";
 import type { Debt, User } from "@/types";
 
 const user: User = {
@@ -13,7 +13,7 @@ const user: User = {
 };
 
 beforeEach(() => {
-  useAppStore.getState().resetAll();
+  useAppStore.setState({ ...createDefaultAppData(), hydrated: true });
 });
 
 describe("useAppStore", () => {
@@ -68,9 +68,24 @@ describe("useAppStore", () => {
     ]);
   });
 
-  it("clears data on resetAll", () => {
+  it("resets financial data while keeping the representative profile", () => {
     useAppStore.getState().setUser(user);
-    useAppStore.getState().resetAll();
-    expect(useAppStore.getState().user).toBeNull();
+    useAppStore.getState().addDebt({
+      id: "d9",
+      userId: "u1",
+      name: "카드론",
+      balance: 1_000,
+      annualRate: 0,
+      monthlyPayment: 0,
+      updatedAt: "2026-01-01T00:00:00.000Z",
+    });
+    useAppStore.getState().setStepComplete("step-1", true);
+
+    useAppStore.getState().resetFinancialData();
+
+    const state = useAppStore.getState();
+    expect(state.debts).toHaveLength(0);
+    expect(state.courseProgress.completedSteps).toEqual([]);
+    expect(state.user?.nickname).toBe("이모 대표");
   });
 });

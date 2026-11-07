@@ -15,7 +15,7 @@ export default function SettingsPage() {
   const user = useAppStore((state) => state.user);
   const updateUser = useAppStore((state) => state.updateUser);
   const importData = useAppStore((state) => state.importData);
-  const resetAll = useAppStore((state) => state.resetAll);
+  const resetFinancialData = useAppStore((state) => state.resetFinancialData);
 
   const [nickname, setNickname] = useState(user?.nickname ?? "");
   const [foundedAt, setFoundedAt] = useState(
@@ -45,9 +45,13 @@ export default function SettingsPage() {
   }
 
   function handleReset() {
-    if (window.confirm("모든 데이터를 삭제할까요? 되돌릴 수 없습니다.")) {
-      resetAll();
-      setMessage("데이터를 초기화했습니다.");
+    if (
+      window.confirm(
+        "재무·학습 데이터를 모두 삭제할까요? 대표 정보(닉네임·설립일)는 남습니다. 되돌릴 수 없습니다.",
+      )
+    ) {
+      resetFinancialData();
+      setMessage("재무 데이터를 삭제했습니다. 대표 정보는 유지됩니다.");
     }
   }
 
@@ -118,11 +122,15 @@ export default function SettingsPage() {
         </Card>
 
         <Card>
-          <CardTitle hint="되돌릴 수 없음">데이터 초기화</CardTitle>
+          <CardTitle hint="대표 정보는 유지">데이터 초기화</CardTitle>
           <Button variant="danger" onClick={handleReset}>
             <RotateCcw size={16} />
-            모든 데이터 삭제
+            재무 데이터 삭제
           </Button>
+          <p className="mt-3 text-xs text-muted">
+            손익·재무상태·현금흐름·부채·연간·도구·학습 진행이 삭제됩니다. 대표 정보(닉네임·설립일)는
+            남으므로, 백업을 불러오기 전에 초기화해도 온보딩을 다시 하지 않아도 됩니다.
+          </p>
         </Card>
 
         {message ? <p className="text-sm text-positive">{message}</p> : null}
