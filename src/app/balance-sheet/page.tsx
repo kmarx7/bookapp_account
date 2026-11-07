@@ -10,6 +10,8 @@ import { Gauge } from "@/components/ui/Gauge";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { FieldGroup, FieldRow } from "@/components/forms/FieldRow";
 import { CurrencyInput } from "@/components/forms/CurrencyInput";
+import { Sheet, SheetGroup, SheetRow } from "@/components/statement/Sheet";
+import { ViewTabs, type SheetView } from "@/components/statement/ViewTabs";
 import { useAppStore } from "@/store/useAppStore";
 import {
   calcBalanceSheet,
@@ -20,15 +22,17 @@ import {
   DEBT_LABELS,
   FIXED_ASSET_LABELS,
 } from "@/lib/constants";
-import { formatDate, formatKRW } from "@/lib/format";
+import { formatDate, formatKRW, formatPercent } from "@/lib/format";
 import type { BalanceSheet as BalanceSheetType } from "@/types";
 
 export default function BalanceSheetPage() {
+  const userName = useAppStore((state) => state.user?.nickname);
   const userId = useAppStore((state) => state.user?.id ?? "local");
   const balanceSheets = useAppStore((state) => state.balanceSheets);
   const upsert = useAppStore((state) => state.upsertBalanceSheet);
   const removeBalanceSheet = useAppStore((state) => state.removeBalanceSheet);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [view, setView] = useState<SheetView>("input");
 
   const latest = useMemo(
     () =>
@@ -111,93 +115,152 @@ export default function BalanceSheetPage() {
         </div>
       ) : null}
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Card>
-          <CardTitle hint="입력">자산 / 부채</CardTitle>
-          <div className="flex flex-col gap-4">
-            <FieldGroup title="유동자산">
-              {(Object.keys(CURRENT_ASSET_LABELS) as (keyof typeof CURRENT_ASSET_LABELS)[]).map(
-                (key) => (
-                  <FieldRow key={key} label={CURRENT_ASSET_LABELS[key]}>
+      <ViewTabs view={view} onChange={setView} />
+
+      {view === "input" ? (
+        <div className="grid gap-4 lg:grid-cols-2">
+          <Card>
+            <CardTitle hint="입력">자산 / 부채</CardTitle>
+            <div className="flex flex-col gap-4">
+              <FieldGroup title="유동자산">
+                {(Object.keys(CURRENT_ASSET_LABELS) as (keyof typeof CURRENT_ASSET_LABELS)[]).map(
+                  (key) => (
+                    <FieldRow key={key} label={CURRENT_ASSET_LABELS[key]}>
+                      <CurrencyInput
+                        value={current.currentAssets[key]}
+                        onChange={(value) =>
+                          update({
+                            currentAssets: { ...current.currentAssets, [key]: value },
+                          })
+                        }
+                      />
+                    </FieldRow>
+                  ),
+                )}
+              </FieldGroup>
+
+              <FieldGroup title="고정자산">
+                {(Object.keys(FIXED_ASSET_LABELS) as (keyof typeof FIXED_ASSET_LABELS)[]).map(
+                  (key) => (
+                    <FieldRow key={key} label={FIXED_ASSET_LABELS[key]}>
+                      <CurrencyInput
+                        value={current.fixedAssets[key]}
+                        onChange={(value) =>
+                          update({
+                            fixedAssets: { ...current.fixedAssets, [key]: value },
+                          })
+                        }
+                      />
+                    </FieldRow>
+                  ),
+                )}
+              </FieldGroup>
+
+              <FieldGroup title="부채">
+                {(Object.keys(DEBT_LABELS) as (keyof typeof DEBT_LABELS)[]).map((key) => (
+                  <FieldRow key={key} label={DEBT_LABELS[key]}>
                     <CurrencyInput
-                      value={current.currentAssets[key]}
+                      value={current.debts[key]}
                       onChange={(value) =>
-                        update({
-                          currentAssets: { ...current.currentAssets, [key]: value },
-                        })
+                        update({ debts: { ...current.debts, [key]: value } })
                       }
                     />
                   </FieldRow>
-                ),
-              )}
-            </FieldGroup>
+                ))}
+              </FieldGroup>
 
-            <FieldGroup title="고정자산">
-              {(Object.keys(FIXED_ASSET_LABELS) as (keyof typeof FIXED_ASSET_LABELS)[]).map(
-                (key) => (
-                  <FieldRow key={key} label={FIXED_ASSET_LABELS[key]}>
-                    <CurrencyInput
-                      value={current.fixedAssets[key]}
-                      onChange={(value) =>
-                        update({
-                          fixedAssets: { ...current.fixedAssets, [key]: value },
-                        })
-                      }
-                    />
-                  </FieldRow>
-                ),
-              )}
-            </FieldGroup>
-
-            <FieldGroup title="부채">
-              {(Object.keys(DEBT_LABELS) as (keyof typeof DEBT_LABELS)[]).map((key) => (
-                <FieldRow key={key} label={DEBT_LABELS[key]}>
-                  <CurrencyInput
-                    value={current.debts[key]}
-                    onChange={(value) =>
-                      update({ debts: { ...current.debts, [key]: value } })
-                    }
-                  />
-                </FieldRow>
-              ))}
-            </FieldGroup>
-
-            <div className="flex justify-end">
-              <Button
-                variant="danger"
-                size="sm"
-                onClick={() => {
-                  removeBalanceSheet(current.id);
-                  setSelectedId(null);
-                }}
-              >
-                <Trash2 size={14} />
-                이 결산 삭제
-              </Button>
+              <div className="flex justify-end">
+                <Button
+                  variant="danger"
+                  size="sm"
+                  onClick={() => {
+                    removeBalanceSheet(current.id);
+                    setSelectedId(null);
+                  }}
+                >
+                  <Trash2 size={14} />
+                  이 결산 삭제
+                </Button>
+              </div>
             </div>
-          </div>
-        </Card>
+          </Card>
 
-        <Card className="lg:sticky lg:top-6 lg:self-start">
-          <CardTitle>자동 계산 결과</CardTitle>
-          <div className="flex flex-col gap-3">
-            <div className="grid grid-cols-2 gap-3">
-              <StatBlock label="유동자산" value={formatKRW(computed.totalCurrentAssets)} />
-              <StatBlock label="고정자산" value={formatKRW(computed.totalFixedAssets)} />
+          <Card className="lg:sticky lg:top-6 lg:self-start">
+            <CardTitle>자동 계산 결과</CardTitle>
+            <div className="flex flex-col gap-3">
+              <div className="grid grid-cols-2 gap-3">
+                <StatBlock label="유동자산" value={formatKRW(computed.totalCurrentAssets)} />
+                <StatBlock label="고정자산" value={formatKRW(computed.totalFixedAssets)} />
+              </div>
+              <StatBlock label="자산 총계" value={formatKRW(computed.totalAssets)} />
+              <StatBlock label="부채 총계" value={formatKRW(computed.totalDebts)} tone="negative" />
+              <StatBlock
+                label="자기자본"
+                value={formatKRW(computed.equity)}
+                tone={toneForValue(computed.equity)}
+              />
+              <div className="pt-2">
+                <Gauge ratio={computed.equityRatio} label="자기자본 비율" />
+              </div>
             </div>
-            <StatBlock label="자산 총계" value={formatKRW(computed.totalAssets)} />
-            <StatBlock label="부채 총계" value={formatKRW(computed.totalDebts)} tone="negative" />
-            <StatBlock
-              label="자기자본"
+          </Card>
+        </div>
+      ) : (
+        <Sheet
+          title="재무상태표"
+          meta={`기준일 ${formatDate(current.baseDate)}`}
+          userName={userName}
+        >
+          <tbody>
+            <SheetGroup label="Ⅰ. 유동자산" />
+            {(Object.keys(CURRENT_ASSET_LABELS) as (keyof typeof CURRENT_ASSET_LABELS)[]).map((key) => (
+              <SheetRow
+                key={key}
+                label={CURRENT_ASSET_LABELS[key]}
+                value={formatKRW(current.currentAssets[key])}
+                indent
+              />
+            ))}
+            <SheetRow label="유동자산 소계" value={formatKRW(computed.totalCurrentAssets)} strong />
+          </tbody>
+          <tbody>
+            <SheetGroup label="Ⅱ. 고정자산" />
+            {(Object.keys(FIXED_ASSET_LABELS) as (keyof typeof FIXED_ASSET_LABELS)[]).map((key) => (
+              <SheetRow
+                key={key}
+                label={FIXED_ASSET_LABELS[key]}
+                value={formatKRW(current.fixedAssets[key])}
+                indent
+              />
+            ))}
+            <SheetRow label="고정자산 소계" value={formatKRW(computed.totalFixedAssets)} strong />
+          </tbody>
+          <tbody>
+            <SheetRow label="자산 총액" value={formatKRW(computed.totalAssets)} strong />
+          </tbody>
+          <tbody>
+            <SheetGroup label="부채" />
+            {(Object.keys(DEBT_LABELS) as (keyof typeof DEBT_LABELS)[]).map((key) => (
+              <SheetRow
+                key={key}
+                label={DEBT_LABELS[key]}
+                value={formatKRW(current.debts[key])}
+                indent
+              />
+            ))}
+            <SheetRow label="부채 총액" value={formatKRW(computed.totalDebts)} strong tone="negative" />
+          </tbody>
+          <tbody>
+            <SheetRow
+              label="자기자본 (자산 − 부채)"
               value={formatKRW(computed.equity)}
-              tone={toneForValue(computed.equity)}
+              strong
+              tone={computed.equity < 0 ? "negative" : "positive"}
             />
-            <div className="pt-2">
-              <Gauge ratio={computed.equityRatio} label="자기자본 비율" />
-            </div>
-          </div>
-        </Card>
-      </div>
+            <SheetRow label="자기자본 비율" value={formatPercent(computed.equityRatio)} />
+          </tbody>
+        </Sheet>
+      )}
     </>
   );
 }

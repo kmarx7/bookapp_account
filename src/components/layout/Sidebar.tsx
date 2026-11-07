@@ -8,7 +8,7 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col gap-1 border-r border-border bg-surface px-3 py-6 md:flex">
+    <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col gap-1 border-r border-border bg-surface px-3 py-6 print:hidden md:flex">
       <div className="px-3 pb-4">
         <p className="text-lg font-bold text-brand">내가 대표</p>
         <p className="text-xs text-muted">1인가구 재무제표</p>
