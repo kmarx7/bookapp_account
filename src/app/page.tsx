@@ -190,7 +190,7 @@ export default function HomePage() {
 
       <Link
         href="/income"
-        className="fixed bottom-20 right-5 z-10 flex h-14 w-14 items-center justify-center rounded-full bg-brand text-white shadow-lg transition-transform hover:scale-105 md:bottom-8 md:right-8"
+        className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] right-5 z-10 flex h-14 w-14 items-center justify-center rounded-full bg-brand text-white shadow-lg transition-transform hover:scale-105 md:bottom-8 md:right-8"
         aria-label="빠른 입력"
       >
         <Plus size={24} />

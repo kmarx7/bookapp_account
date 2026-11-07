@@ -17,7 +17,7 @@ export function MonthSwitcher({
         type="button"
         onClick={onPrev}
         aria-label="이전 달"
-        className="rounded-lg p-2 text-muted transition-colors hover:bg-brand-soft"
+        className="min-h-[2.5rem] min-w-[2.5rem] rounded-lg p-2.5 text-muted transition-colors hover:bg-brand-soft"
       >
         <ChevronLeft size={18} />
       </button>
@@ -26,7 +26,7 @@ export function MonthSwitcher({
         type="button"
         onClick={onNext}
         aria-label="다음 달"
-        className="rounded-lg p-2 text-muted transition-colors hover:bg-brand-soft"
+        className="min-h-[2.5rem] min-w-[2.5rem] rounded-lg p-2.5 text-muted transition-colors hover:bg-brand-soft"
       >
         <ChevronRight size={18} />
       </button>

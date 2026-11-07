@@ -8,7 +8,7 @@ export function BottomTabBar() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-surface md:hidden">
+    <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-surface pb-[env(safe-area-inset-bottom)] md:hidden">
       <ul className="mx-auto flex max-w-6xl">
         {PRIMARY_TABS.map((item) => {
           const active = isActive(pathname, item.href);
