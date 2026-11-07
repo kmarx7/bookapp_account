@@ -21,3 +21,7 @@ create policy "own row insert" on public.app_data
 
 create policy "own row update" on public.app_data
   for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+-- 로그인 사용자(authenticated)에게 테이블 접근 권한 부여 (행은 RLS가 제한)
+grant usage on schema public to authenticated;
+grant select, insert, update on public.app_data to authenticated;
