@@ -3,6 +3,7 @@ import "./globals.css";
 import { StoreHydrator } from "@/components/layout/StoreHydrator";
 import { AppGate } from "@/components/layout/AppGate";
 import { ServiceWorkerRegister } from "@/components/pwa/ServiceWorkerRegister";
+import { SyncManager } from "@/components/sync/SyncManager";
 
 export const metadata: Metadata = {
   title: "내가 대표 — 1인가구 재무제표",
@@ -36,6 +37,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <AppGate>{children}</AppGate>
         </StoreHydrator>
         <ServiceWorkerRegister />
+        <SyncManager />
       </body>
     </html>
   );

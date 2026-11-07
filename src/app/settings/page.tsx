@@ -6,6 +6,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { useAppStore } from "@/store/useAppStore";
+import { AccountPanel } from "@/components/sync/AccountPanel";
 import { exportBackup, parseBackup } from "@/lib/storage/backup";
 import { toAppData } from "@/lib/storage/schema";
 import { formatDate } from "@/lib/format";
@@ -90,6 +91,8 @@ export default function SettingsPage() {
             </div>
           </div>
         </Card>
+
+        <AccountPanel />
 
         <Card>
           <CardTitle hint="JSON">데이터 백업</CardTitle>
