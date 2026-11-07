@@ -86,5 +86,12 @@ src/
 ## 품질 측정
 
 - 단위 테스트: `npm test` (12 파일 / 50 테스트)
-- Lighthouse 12.8.2 (프로덕션 빌드, 데스크탑): 접근성 **100** · 권장사항 100 · SEO 100 · 성능 83
-  - 남은 성능 과제: LCP 4.49s(폰트 CDN이 렌더 차단), `legacy-javascript` — 후속 개선 대상
+- Lighthouse 12.8.2 · 프로덕션 빌드 (`npm run build && npm start`)
+  - **데스크탑**: 성능 **99** · 접근성 100 · 권장사항 100 · SEO 100 (LCP 0.98s, FCP 0.49s, TBT 0ms, CLS 0.000)
+  - **모바일**(4x CPU · Slow 4G): 성능 72~83 · 접근성 100 — LCP 약 4.4s
+- 폰트: Pretendard를 CSS `@import`로 두면 브라우저가 우리 CSS를 파싱한 뒤에야 CDN 요청을 시작해
+  렌더 차단(측정 838ms)이 발생했다. `layout.tsx`의 `preconnect` + `preload` + `<link>`로 옮겨
+  렌더 차단 목록에서 제외했다.
+- 남은 성능 과제(모바일): 첫 방문자가 `/`에서 클라이언트 리다이렉트로 `/onboarding`에 도달하기까지
+  렌더가 비어 있고(AppGate + 스토어 hydration), JS 341KB + 폰트 하위집합 8개(214KB)를 받는다.
+  모바일 성능 점수는 실행마다 변동이 커서(TBT 67~426ms) 단일 실행만으로 판단하지 않는다.
