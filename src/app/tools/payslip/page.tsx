@@ -1,38 +1,36 @@
 "use client";
 
-import { useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, CardTitle } from "@/components/ui/Card";
 import { StatBlock } from "@/components/ui/StatBlock";
 import { CurrencyInput } from "@/components/forms/CurrencyInput";
 import { analyzePayslip } from "@/lib/calculations/payslip";
+import { useAppStore } from "@/store/useAppStore";
 import { formatKRW, formatPercent } from "@/lib/format";
 import type { PayslipItem } from "@/types";
 
-const INITIAL: PayslipItem[] = [
-  { id: "p1", name: "기본급", amount: 0, kind: "income" },
-];
-
 export default function PayslipPage() {
-  const [items, setItems] = useState<PayslipItem[]>(INITIAL);
+  const items = useAppStore((state) => state.tools.payslip);
+  const updateTool = useAppStore((state) => state.updateTool);
   const result = analyzePayslip(items);
 
   function addItem() {
-    setItems((prev) => [
-      ...prev,
+    updateTool("payslip", [
+      ...items,
       { id: crypto.randomUUID(), name: "", amount: 0, kind: "deduction" },
     ]);
   }
 
   function updateItem(id: string, patch: Partial<PayslipItem>) {
-    setItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, ...patch } : item)),
+    updateTool(
+      "payslip",
+      items.map((item) => (item.id === id ? { ...item, ...patch } : item)),
     );
   }
 
   function removeItem(id: string) {
-    setItems((prev) => prev.filter((item) => item.id !== id));
+    updateTool("payslip", items.filter((item) => item.id !== id));
   }
 
   return (

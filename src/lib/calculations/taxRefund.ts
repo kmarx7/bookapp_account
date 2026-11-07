@@ -1,4 +1,6 @@
-export type RefundUse = "spend" | "asset" | "debt";
+import type { RefundUse } from "@/types";
+
+export type { RefundUse };
 
 export interface RefundEffect {
   equityDelta: number;

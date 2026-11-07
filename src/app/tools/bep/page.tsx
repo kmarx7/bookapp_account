@@ -1,19 +1,18 @@
 "use client";
 
-import { useState } from "react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, CardTitle } from "@/components/ui/Card";
 import { StatBlock } from "@/components/ui/StatBlock";
 import { FieldRow } from "@/components/forms/FieldRow";
 import { CurrencyInput } from "@/components/forms/CurrencyInput";
 import { calcBEP } from "@/lib/calculations/bep";
+import { useAppStore } from "@/store/useAppStore";
 import { formatKRW, formatPercent } from "@/lib/format";
 
 export default function BepPage() {
-  const [fixedCost, setFixedCost] = useState(1_000_000);
-  const [variableCost, setVariableCost] = useState(600_000);
-  const [revenue, setRevenue] = useState(2_000_000);
-  const result = calcBEP({ fixedCost, variableCost, revenue });
+  const bep = useAppStore((state) => state.tools.bep);
+  const updateTool = useAppStore((state) => state.updateTool);
+  const result = calcBEP(bep);
 
   return (
     <>
@@ -27,13 +26,22 @@ export default function BepPage() {
           <CardTitle>입력</CardTitle>
           <div className="divide-y divide-border">
             <FieldRow label="고정비 (월)">
-              <CurrencyInput value={fixedCost} onChange={setFixedCost} />
+              <CurrencyInput
+                value={bep.fixedCost}
+                onChange={(value) => updateTool("bep", { ...bep, fixedCost: value })}
+              />
             </FieldRow>
             <FieldRow label="변동비 (월)">
-              <CurrencyInput value={variableCost} onChange={setVariableCost} />
+              <CurrencyInput
+                value={bep.variableCost}
+                onChange={(value) => updateTool("bep", { ...bep, variableCost: value })}
+              />
             </FieldRow>
             <FieldRow label="매출 (월)">
-              <CurrencyInput value={revenue} onChange={setRevenue} />
+              <CurrencyInput
+                value={bep.revenue}
+                onChange={(value) => updateTool("bep", { ...bep, revenue: value })}
+              />
             </FieldRow>
           </div>
         </Card>

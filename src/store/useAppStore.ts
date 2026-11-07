@@ -6,9 +6,10 @@ import type {
   CashFlow,
   Debt,
   IncomeStatement,
+  ToolData,
   User,
 } from "@/types";
-import { DEFAULT_APP_DATA } from "@/lib/storage/schema";
+import { createDefaultAppData } from "@/lib/storage/schema";
 
 export interface AppState extends AppData {
   hydrated: boolean;
@@ -26,6 +27,7 @@ export interface AppState extends AppData {
   updateAnnual: (id: string, patch: Partial<AnnualTracking>) => void;
   setStepComplete: (id: string, complete: boolean) => void;
   resetCourse: () => void;
+  updateTool: <K extends keyof ToolData>(key: K, value: ToolData[K]) => void;
   importData: (data: AppData) => void;
   resetAll: () => void;
 }
@@ -41,7 +43,7 @@ function upsertById<T extends { id: string }>(list: T[], value: T): T[] {
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
-  ...DEFAULT_APP_DATA,
+  ...createDefaultAppData(),
   hydrated: false,
 
   hydrate: (data) => set({ ...data, hydrated: true }),
@@ -124,9 +126,14 @@ export const useAppStore = create<AppState>((set, get) => ({
   resetCourse: () =>
     set({ courseProgress: { completedSteps: [], updatedAt: now() } }),
 
+  updateTool: (key, value) =>
+    set((state) => ({
+      tools: { ...state.tools, [key]: value, updatedAt: now() } as ToolData,
+    })),
+
   importData: (data) => set({ ...data, hydrated: true }),
 
-  resetAll: () => set({ ...DEFAULT_APP_DATA, hydrated: true }),
+  resetAll: () => set({ ...createDefaultAppData(), hydrated: true }),
 }));
 
 export function selectIncomeStatement(

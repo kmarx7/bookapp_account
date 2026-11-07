@@ -29,7 +29,14 @@ export function mergeAppData(local: AppData, remote: AppData): AppData {
     debts: mergeCollection(local.debts, remote.debts),
     annualTrackings: mergeCollection(local.annualTrackings, remote.annualTrackings),
     courseProgress: mergeCourseProgress(local, remote),
+    tools: mergeTools(local, remote),
   };
+}
+
+function mergeTools(local: AppData, remote: AppData) {
+  return (remote.tools.updatedAt ?? "") > (local.tools.updatedAt ?? "")
+    ? remote.tools
+    : local.tools;
 }
 
 function mergeUser(local: AppData, remote: AppData) {

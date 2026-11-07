@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, CardTitle } from "@/components/ui/Card";
 import { StatBlock } from "@/components/ui/StatBlock";
 import { CurrencyInput } from "@/components/forms/CurrencyInput";
 import { summarizeInsurance } from "@/lib/calculations/insurance";
+import { useAppStore } from "@/store/useAppStore";
 import { formatKRW } from "@/lib/format";
 import type { InsuranceItem } from "@/types";
 
@@ -16,17 +16,14 @@ const KIND_LABELS: Record<InsuranceItem["kind"], string> = {
   mixed: "혼합",
 };
 
-const INITIAL: InsuranceItem[] = [
-  { id: "i1", name: "", monthlyPremium: 0, kind: "protection", savingsMonthly: 0 },
-];
-
 export default function InsurancePage() {
-  const [items, setItems] = useState<InsuranceItem[]>(INITIAL);
+  const items = useAppStore((state) => state.tools.insurance);
+  const updateTool = useAppStore((state) => state.updateTool);
   const summary = summarizeInsurance(items);
 
   function addItem() {
-    setItems((prev) => [
-      ...prev,
+    updateTool("insurance", [
+      ...items,
       {
         id: crypto.randomUUID(),
         name: "",
@@ -38,13 +35,14 @@ export default function InsurancePage() {
   }
 
   function updateItem(id: string, patch: Partial<InsuranceItem>) {
-    setItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, ...patch } : item)),
+    updateTool(
+      "insurance",
+      items.map((item) => (item.id === id ? { ...item, ...patch } : item)),
     );
   }
 
   function removeItem(id: string) {
-    setItems((prev) => prev.filter((item) => item.id !== id));
+    updateTool("insurance", items.filter((item) => item.id !== id));
   }
 
   return (

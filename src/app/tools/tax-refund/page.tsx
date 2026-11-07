@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, CardTitle } from "@/components/ui/Card";
 import { StatBlock } from "@/components/ui/StatBlock";
 import { CurrencyInput } from "@/components/forms/CurrencyInput";
 import { FieldRow } from "@/components/forms/FieldRow";
-import { refundEffect, type RefundUse } from "@/lib/calculations/taxRefund";
+import { refundEffect } from "@/lib/calculations/taxRefund";
+import { useAppStore } from "@/store/useAppStore";
 import { formatKRW } from "@/lib/format";
+import type { RefundUse } from "@/types";
 
 const USE_OPTIONS: { value: RefundUse; label: string }[] = [
   { value: "spend", label: "소비" },
@@ -18,17 +19,15 @@ const USE_OPTIONS: { value: RefundUse; label: string }[] = [
 const CHECKS = ["이직", "연봉 인상", "보험 가입/해지", "병원비 증가"];
 
 export default function TaxRefundPage() {
-  const [lastYear, setLastYear] = useState(0);
-  const [expected, setExpected] = useState(0);
-  const [use, setUse] = useState<RefundUse>("debt");
-  const [checks, setChecks] = useState<string[]>([]);
-
-  const effect = refundEffect(expected, use);
+  const tool = useAppStore((state) => state.tools.taxRefund);
+  const updateTool = useAppStore((state) => state.updateTool);
+  const effect = refundEffect(tool.expected, tool.use);
 
   function toggleCheck(label: string) {
-    setChecks((prev) =>
-      prev.includes(label) ? prev.filter((item) => item !== label) : [...prev, label],
-    );
+    const checks = tool.checks.includes(label)
+      ? tool.checks.filter((item) => item !== label)
+      : [...tool.checks, label];
+    updateTool("taxRefund", { ...tool, checks });
   }
 
   return (
@@ -44,10 +43,16 @@ export default function TaxRefundPage() {
           <div className="flex flex-col gap-4">
             <div className="divide-y divide-border">
               <FieldRow label="작년 환급액 (추납이면 음수)">
-                <CurrencyInput value={lastYear} onChange={setLastYear} />
+                <CurrencyInput
+                  value={tool.lastYear}
+                  onChange={(value) => updateTool("taxRefund", { ...tool, lastYear: value })}
+                />
               </FieldRow>
               <FieldRow label="올해 예상 환급액">
-                <CurrencyInput value={expected} onChange={setExpected} />
+                <CurrencyInput
+                  value={tool.expected}
+                  onChange={(value) => updateTool("taxRefund", { ...tool, expected: value })}
+                />
               </FieldRow>
             </div>
             <div>
@@ -59,7 +64,7 @@ export default function TaxRefundPage() {
                     type="button"
                     onClick={() => toggleCheck(label)}
                     className={`rounded-lg border px-3 py-1.5 text-xs transition-colors ${
-                      checks.includes(label)
+                      tool.checks.includes(label)
                         ? "border-brand bg-brand text-white"
                         : "border-border bg-surface text-muted hover:bg-brand-soft"
                     }`}
@@ -76,9 +81,9 @@ export default function TaxRefundPage() {
                   <button
                     key={option.value}
                     type="button"
-                    onClick={() => setUse(option.value)}
+                    onClick={() => updateTool("taxRefund", { ...tool, use: option.value })}
                     className={`rounded-lg border px-3 py-1.5 text-xs transition-colors ${
-                      use === option.value
+                      tool.use === option.value
                         ? "border-brand bg-brand text-white"
                         : "border-border bg-surface text-muted hover:bg-brand-soft"
                     }`}
@@ -94,14 +99,14 @@ export default function TaxRefundPage() {
         <Card>
           <CardTitle>자기자본 영향</CardTitle>
           <div className="flex flex-col gap-3">
-            <StatBlock label="예상 환급액" value={formatKRW(expected)} />
+            <StatBlock label="예상 환급액" value={formatKRW(tool.expected)} />
             <StatBlock
               label="자기자본 증가"
               value={formatKRW(effect.equityDelta)}
               tone={effect.equityDelta > 0 ? "positive" : "neutral"}
               sub={effect.description}
             />
-            <StatBlock label="작년 대비" value={formatKRW(expected - lastYear)} />
+            <StatBlock label="작년 대비" value={formatKRW(tool.expected - tool.lastYear)} />
             <p className="rounded-xl bg-surface-muted px-4 py-3 text-xs text-muted">
               공제는 소득을 줄이고, 세액공제는 세금에서 직접 뺍니다. 영수증을 챙기지
               않으면 공제를 못 받으니, 올해는 병원·약국·교육비 영수증을 모아두세요.

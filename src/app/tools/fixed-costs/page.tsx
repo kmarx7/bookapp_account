@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, CardTitle } from "@/components/ui/Card";
@@ -9,32 +8,31 @@ import { Badge } from "@/components/ui/Badge";
 import { CurrencyInput } from "@/components/forms/CurrencyInput";
 import { summarizeFixedCosts } from "@/lib/calculations/fixedCosts";
 import { FIXED_COST_PERIOD_LABELS } from "@/lib/constants";
+import { useAppStore } from "@/store/useAppStore";
 import { formatKRW } from "@/lib/format";
 import type { FixedCostItem } from "@/types";
 
-const INITIAL: FixedCostItem[] = [
-  { id: "f1", name: "", amount: 0, period: "monthly" },
-];
-
 export default function FixedCostsPage() {
-  const [items, setItems] = useState<FixedCostItem[]>(INITIAL);
+  const items = useAppStore((state) => state.tools.fixedCosts);
+  const updateTool = useAppStore((state) => state.updateTool);
   const summary = summarizeFixedCosts(items);
 
   function addItem() {
-    setItems((prev) => [
-      ...prev,
+    updateTool("fixedCosts", [
+      ...items,
       { id: crypto.randomUUID(), name: "", amount: 0, period: "monthly" },
     ]);
   }
 
   function updateItem(id: string, patch: Partial<FixedCostItem>) {
-    setItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, ...patch } : item)),
+    updateTool(
+      "fixedCosts",
+      items.map((item) => (item.id === id ? { ...item, ...patch } : item)),
     );
   }
 
   function removeItem(id: string) {
-    setItems((prev) => prev.filter((item) => item.id !== id));
+    updateTool("fixedCosts", items.filter((item) => item.id !== id));
   }
 
   return (

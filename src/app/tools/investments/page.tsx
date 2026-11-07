@@ -1,38 +1,36 @@
 "use client";
 
-import { useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, CardTitle } from "@/components/ui/Card";
 import { StatBlock, toneForValue } from "@/components/ui/StatBlock";
 import { CurrencyInput } from "@/components/forms/CurrencyInput";
 import { summarizeInvestments } from "@/lib/calculations/investments";
+import { useAppStore } from "@/store/useAppStore";
 import { formatKRW, formatSignedPercent } from "@/lib/format";
 import type { InvestmentItem } from "@/types";
 
-const INITIAL: InvestmentItem[] = [
-  { id: "v1", name: "", cost: 0, marketValue: 0 },
-];
-
 export default function InvestmentsPage() {
-  const [items, setItems] = useState<InvestmentItem[]>(INITIAL);
+  const items = useAppStore((state) => state.tools.investments);
+  const updateTool = useAppStore((state) => state.updateTool);
   const summary = summarizeInvestments(items);
 
   function addItem() {
-    setItems((prev) => [
-      ...prev,
+    updateTool("investments", [
+      ...items,
       { id: crypto.randomUUID(), name: "", cost: 0, marketValue: 0 },
     ]);
   }
 
   function updateItem(id: string, patch: Partial<InvestmentItem>) {
-    setItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, ...patch } : item)),
+    updateTool(
+      "investments",
+      items.map((item) => (item.id === id ? { ...item, ...patch } : item)),
     );
   }
 
   function removeItem(id: string) {
-    setItems((prev) => prev.filter((item) => item.id !== id));
+    updateTool("investments", items.filter((item) => item.id !== id));
   }
 
   return (

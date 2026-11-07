@@ -63,6 +63,7 @@ describe("useAppStore", () => {
       "debts",
       "incomeStatements",
       "schemaVersion",
+      "tools",
       "user",
     ]);
   });

@@ -135,6 +135,7 @@ export interface AppData {
   debts: Debt[];
   annualTrackings: AnnualTracking[];
   courseProgress: CourseProgress;
+  tools: ToolData;
 }
 
 export interface PayslipItem {
@@ -173,4 +174,28 @@ export interface InvestmentItem {
   name: string;
   cost: number;
   marketValue: number;
+}
+
+export type RefundUse = "spend" | "asset" | "debt";
+
+export interface ExpenseDraft {
+  id: string;
+  name: string;
+  amount: number;
+}
+
+export interface ToolData {
+  bep: { fixedCost: number; variableCost: number; revenue: number };
+  payslip: PayslipItem[];
+  fixedCosts: FixedCostItem[];
+  expenseReview: ExpenseDraft[];
+  insurance: InsuranceItem[];
+  investments: InvestmentItem[];
+  taxRefund: {
+    lastYear: number;
+    expected: number;
+    use: RefundUse;
+    checks: string[];
+  };
+  updatedAt: string;
 }

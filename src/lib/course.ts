@@ -137,6 +137,7 @@ export const COURSE_STEPS: CourseStep[] = [
       target: "/tools/payslip",
       targetLabel: "명세서 감사 도구",
     },
+    isComplete: (data) => data.tools.payslip.some((item) => item.amount > 0),
   },
   {
     id: "ch05",
@@ -160,6 +161,7 @@ export const COURSE_STEPS: CourseStep[] = [
       target: "/tools/fixed-costs",
       targetLabel: "고정비 결산 도구",
     },
+    isComplete: (data) => data.tools.fixedCosts.some((item) => item.amount > 0),
   },
   {
     id: "ch06",
@@ -185,6 +187,8 @@ export const COURSE_STEPS: CourseStep[] = [
       target: "/tools/bep",
       targetLabel: "손익분기점 계산기",
     },
+    isComplete: (data) =>
+      data.tools.bep.revenue > 0 && data.tools.bep.fixedCost > 0,
   },
   {
     id: "ch07",
@@ -208,6 +212,8 @@ export const COURSE_STEPS: CourseStep[] = [
       target: "/tools/expense-review",
       targetLabel: "지출 감정평가 도구",
     },
+    isComplete: (data) =>
+      data.tools.expenseReview.some((item) => item.amount > 0),
   },
   {
     id: "ch08",
@@ -354,6 +360,8 @@ export const COURSE_STEPS: CourseStep[] = [
       target: "/tools/insurance",
       targetLabel: "보험 회계 분류",
     },
+    isComplete: (data) =>
+      data.tools.insurance.some((item) => item.monthlyPremium > 0),
   },
   {
     id: "ch14",
@@ -378,6 +386,10 @@ export const COURSE_STEPS: CourseStep[] = [
       target: "/tools/investments",
       targetLabel: "투자 포트폴리오",
     },
+    isComplete: (data) =>
+      data.tools.investments.some(
+        (item) => item.cost > 0 || item.marketValue > 0,
+      ),
   },
   {
     id: "ch15",
@@ -402,6 +414,7 @@ export const COURSE_STEPS: CourseStep[] = [
       target: "/tools/tax-refund",
       targetLabel: "연말정산 시뮬레이션",
     },
+    isComplete: (data) => data.tools.taxRefund.expected > 0,
   },
   {
     id: "ch16",

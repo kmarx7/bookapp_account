@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, CardTitle } from "@/components/ui/Card";
@@ -10,8 +9,9 @@ import {
   classifyExpense,
   summarizeExpenses,
 } from "@/lib/calculations/expenseReview";
+import { useAppStore } from "@/store/useAppStore";
 import { formatKRW, formatPercent } from "@/lib/format";
-import type { ExpenseItem } from "@/types";
+import type { ExpenseDraft, ExpenseItem } from "@/types";
 
 const CATEGORY_LABELS: Record<ExpenseItem["category"], string> = {
   cost: "비용",
@@ -19,16 +19,9 @@ const CATEGORY_LABELS: Record<ExpenseItem["category"], string> = {
   investment: "투자",
 };
 
-interface Draft {
-  id: string;
-  name: string;
-  amount: number;
-}
-
-const INITIAL: Draft[] = [{ id: "e1", name: "", amount: 0 }];
-
 export default function ExpenseReviewPage() {
-  const [drafts, setDrafts] = useState<Draft[]>(INITIAL);
+  const drafts = useAppStore((state) => state.tools.expenseReview);
+  const updateTool = useAppStore((state) => state.updateTool);
 
   const items: ExpenseItem[] = drafts.map((draft) => ({
     ...draft,
@@ -37,17 +30,21 @@ export default function ExpenseReviewPage() {
   const summary = summarizeExpenses(items);
 
   function addDraft() {
-    setDrafts((prev) => [...prev, { id: crypto.randomUUID(), name: "", amount: 0 }]);
+    updateTool("expenseReview", [
+      ...drafts,
+      { id: crypto.randomUUID(), name: "", amount: 0 },
+    ]);
   }
 
-  function updateDraft(id: string, patch: Partial<Draft>) {
-    setDrafts((prev) =>
-      prev.map((draft) => (draft.id === id ? { ...draft, ...patch } : draft)),
+  function updateDraft(id: string, patch: Partial<ExpenseDraft>) {
+    updateTool(
+      "expenseReview",
+      drafts.map((draft) => (draft.id === id ? { ...draft, ...patch } : draft)),
     );
   }
 
   function removeDraft(id: string) {
-    setDrafts((prev) => prev.filter((draft) => draft.id !== id));
+    updateTool("expenseReview", drafts.filter((draft) => draft.id !== id));
   }
 
   return (

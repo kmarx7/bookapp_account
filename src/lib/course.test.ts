@@ -58,13 +58,29 @@ describe("course completion", () => {
   });
 
   it("marks manual steps complete from progress", () => {
-    const step = stepById("ch05")!;
+    const step = stepById("ch08")!;
     expect(resolveCompletion(step, data())).toBe(false);
     expect(
       resolveCompletion(
         step,
         data({
-          courseProgress: { completedSteps: ["ch05"], updatedAt: "" },
+          courseProgress: { completedSteps: ["ch08"], updatedAt: "" },
+        }),
+      ),
+    ).toBe(true);
+  });
+
+  it("auto-completes tool-backed steps from saved tool input", () => {
+    const base = data();
+    expect(resolveCompletion(stepById("ch05")!, base)).toBe(false);
+    expect(
+      resolveCompletion(
+        stepById("ch05")!,
+        data({
+          tools: {
+            ...base.tools,
+            fixedCosts: [{ id: "f", name: "구독", amount: 12_000, period: "monthly" }],
+          },
         }),
       ),
     ).toBe(true);
