@@ -3,6 +3,8 @@ import {
   COURSE_STEPS,
   COURSE_TOTAL,
   courseStats,
+  nextStepOf,
+  practiceCtaLabel,
   resolveCompletion,
   stepById,
   stepIndex,
@@ -96,5 +98,74 @@ describe("course completion", () => {
     expect(stats.done).toBe(1);
     expect(stats.next?.id).toBe("ch01");
     expect(stats.ratio).toBeCloseTo(1 / 17, 6);
+  });
+});
+
+describe("practice clarity (Phase: 실습 진입 명확화)", () => {
+  it("gives every step a goal, completion hint, duration and task list", () => {
+    for (const step of COURSE_STEPS) {
+      expect(step.practice.goal.length, step.id).toBeGreaterThan(0);
+      expect(step.practice.completionHint.length, step.id).toBeGreaterThan(0);
+      expect(step.practice.duration.length, step.id).toBeGreaterThan(0);
+      expect(step.practice.steps.length, step.id).toBeGreaterThan(0);
+      for (const task of step.practice.steps) {
+        expect(task.text.length, step.id).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it("labels the practice button by action, not by destination", () => {
+    for (const step of COURSE_STEPS) {
+      expect(practiceCtaLabel(step), step.id).toBe("실습하기");
+    }
+  });
+
+  it("gives auto-verified steps a target and explains the manual ones", () => {
+    for (const step of COURSE_STEPS) {
+      if (step.isComplete) {
+        expect(step.practice.target, step.id).toBeDefined();
+      }
+      if (!step.practice.target) {
+        expect(step.practice.completionHint, step.id).toContain("직접 완료");
+      }
+    }
+  });
+
+  it("maps every task to an app location or marks it as paper work", () => {
+    for (const step of COURSE_STEPS) {
+      for (const task of step.practice.steps) {
+        expect(task.where, `${step.id}: ${task.text}`).toBeTruthy();
+      }
+    }
+  });
+
+  it("suggests the first unfinished practice, skipping the intro", () => {
+    // 프롤로그는 소개라 건너뛰고 1장부터 안내한다
+    expect(courseStats(data()).next?.id).toBe("ch01");
+
+    const base = data();
+    const stats = courseStats(
+      data({
+        // 뒤쪽(5장)을 먼저 끝내도 가장 앞의 미완료(1장)로 안내한다
+        tools: {
+          ...base.tools,
+          fixedCosts: [{ id: "f", name: "구독", amount: 12_000, period: "monthly" }],
+        },
+      }),
+    );
+    expect(stats.next?.id).toBe("ch01");
+  });
+
+  it("survives corrupt data in auto checks", () => {
+    const step = stepById("ch09")!; // calcBalanceSheet를 호출하는 자동 판정
+    const corrupt = data({ balanceSheets: [{} as never] });
+
+    expect(() => resolveCompletion(step, corrupt)).not.toThrow();
+    expect(resolveCompletion(step, corrupt)).toBe(false);
+  });
+
+  it("resolves the next step so the practice screen can guide the return", () => {
+    expect(nextStepOf(stepById("ch01")!)?.id).toBe("ch02");
+    expect(nextStepOf(stepById("ch16")!)).toBeUndefined();
   });
 });

@@ -1,11 +1,31 @@
 import type { AppData } from "@/types";
 import { calcBalanceSheet } from "@/lib/calculations/balanceSheet";
 
+/** 실습 항목 하나: 무엇을 하는지 + 앱 어디에서 하는지 */
+export interface PracticeTask {
+  text: string;
+  /** 앱에서 입력할 위치. 앱 밖(종이·메모)이면 그렇게 적는다. */
+  where?: string;
+}
+
 export interface CoursePractice {
+  /** 실습 제목 */
   title: string;
-  steps: string[];
+  /** 한 줄 목표 — 이 실습으로 무엇을 남기는가 */
+  goal: string;
+  /** 완료 조건 문장. 자동 확인 스텝은 실제 판정 기준과 일치해야 한다. */
+  completionHint: string;
+  /** 예상 소요 */
+  duration: string;
+  /** 처음 들어갔을 때 먼저 눌러야 하는 버튼 안내 (해당 화면에만) */
+  startHint?: string;
+  steps: PracticeTask[];
+  /** 실습하러 갈 화면 경로 */
   target?: string;
+  /** 목적지 이름 — 버튼 라벨이 아니라 보조 설명으로만 쓴다 */
   targetLabel?: string;
+  /** 버튼 라벨 (기본 "실습하기") */
+  ctaLabel?: string;
 }
 
 export interface CourseStep {
@@ -24,6 +44,8 @@ const PART_2 = "2부 · 손익계산서 — 내 삶은 장사가 되는가";
 const PART_3 = "3부 · 재무상태표와 현금흐름";
 const PART_4 = "4부 · 투자와 결산";
 
+const PAPER = "종이·메모 (앱 밖)";
+
 export const COURSE_STEPS: CourseStep[] = [
   {
     id: "prologue",
@@ -38,10 +60,13 @@ export const COURSE_STEPS: CourseStep[] = [
     ],
     practice: {
       title: "시작하기 — 나는 대표다",
+      goal: "가계부가 아니라 결산으로 살겠다고 오늘 선언한다",
+      completionHint: "종이·메모로 하는 실습이라 직접 완료로 표시합니다",
+      duration: "약 5분",
       steps: [
-        "가계부와 재무제표의 차이를 한 줄로 적어본다",
-        "지금 이 순간의 '내 것'과 '갚을 것'을 종이에 적어본다",
-        "앞으로 매달 손익을, 매년 자본을 결산하겠다고 다짐한다",
+        { text: "가계부와 재무제표의 차이를 한 줄로 적는다", where: PAPER },
+        { text: "지금 이 순간의 '내 것'과 '갚을 것'을 종이에 적는다", where: PAPER },
+        { text: "앞으로 매달 손익을, 매년 자본을 결산하겠다고 다짐한다", where: PAPER },
       ],
     },
   },
@@ -58,13 +83,17 @@ export const COURSE_STEPS: CourseStep[] = [
     ],
     practice: {
       title: "당신의 첫 재무상태표",
+      goal: "오늘 기준 내 자산·부채·자기자본을 처음으로 숫자로 남긴다",
+      startHint: "재무상태표에서 '첫 등기 시작'을 누르면 입력 화면이 열립니다",
+      completionHint: "재무상태표를 1건 저장하면 자동 완료",
+      duration: "약 10분",
       steps: [
-        "내 자산 — 지금 이 순간 내 명의의 모든 것을 적는다",
-        "내 부채 — 갚아야 할 모든 것을 적는다",
-        "자산 합계에서 부채 합계를 빼면 오늘의 자기자본이다",
+        { text: "내 자산 — 지금 이 순간 내 명의의 모든 것을 적는다", where: "재무상태표 · 통장 잔고 / 적금·예금 / 주식·코인" },
+        { text: "내 부채 — 갚아야 할 모든 것을 적는다", where: "재무상태표 · 학자금 / 카드 잔액 / 마이너스 통장" },
+        { text: "자산 합계에서 부채 합계를 빼면 오늘의 자기자본이다", where: "재무상태표 · 자기자본(자동 계산)" },
       ],
       target: "/balance-sheet",
-      targetLabel: "재무상태표 열기",
+      targetLabel: "재무상태표 입력",
     },
     isComplete: (data) => data.balanceSheets.length > 0,
   },
@@ -81,14 +110,17 @@ export const COURSE_STEPS: CourseStep[] = [
     ],
     practice: {
       title: "나의 첫 손익계산서",
+      goal: "이번 달 수입과 비용을 넣어 영업이익(순이익)을 확인한다",
+      completionHint: "손익계산서를 1건 저장하면 자동 완료",
+      duration: "약 10분",
       steps: [
-        "이번 달 들어온 모든 돈을 적는다 (실수령액 기준)",
-        "고정비를 적는다 (월세·관리비·통신·보험·할부)",
-        "변동비를 적는다 (식비·교통·여가·쇼핑)",
-        "매출총이익에서 영업비용을 빼 영업이익(순이익)을 구한다",
+        { text: "이번 달 들어온 모든 돈을 적는다 (실수령액 기준)", where: "손익계산서 · 실수령액" },
+        { text: "고정비를 적는다 (월세·관리비·통신·보험·할부)", where: "손익계산서 · 고정비" },
+        { text: "변동비를 적는다 (식비·교통·여가·쇼핑)", where: "손익계산서 · 변동비" },
+        { text: "매출총이익에서 영업비용을 빼 영업이익(순이익)을 구한다", where: "손익계산서 · 자동 계산 결과" },
       ],
       target: "/income",
-      targetLabel: "손익계산서 열기",
+      targetLabel: "손익계산서 입력",
     },
     isComplete: (data) => data.incomeStatements.length > 0,
   },
@@ -105,13 +137,17 @@ export const COURSE_STEPS: CourseStep[] = [
     ],
     practice: {
       title: "첫 등기 — 내 재무상태표 작성하기",
+      goal: "자산·부채를 다시 훑고 자기자본을 확정한다",
+      startHint: "재무상태표에서 '첫 등기 시작'을 누르면 입력 화면이 열립니다",
+      completionHint: "재무상태표를 1건 저장하면 자동 완료",
+      duration: "약 10분",
       steps: [
-        "자산 항목을 모두 적는다 (유동·고정·기타)",
-        "부채 항목을 모두 적는다 (유동·고정)",
-        "자기자본을 계산하고 날짜와 서명을 한다",
+        { text: "자산 항목을 모두 적는다 (유동·고정·기타)", where: "재무상태표 · 자산" },
+        { text: "부채 항목을 모두 적는다 (유동·고정)", where: "재무상태표 · 부채" },
+        { text: "자기자본을 계산하고 날짜와 서명을 한다", where: "재무상태표 · 기준일 (서명은 16장 연간 감사에서)" },
       ],
       target: "/balance-sheet",
-      targetLabel: "재무상태표 열기",
+      targetLabel: "재무상태표 입력",
     },
     isComplete: (data) => data.balanceSheets.length > 0,
   },
@@ -128,14 +164,17 @@ export const COURSE_STEPS: CourseStep[] = [
     ],
     practice: {
       title: "내 명세서 감사하기",
+      goal: "월급에서 빠지는 원가 항목을 하나씩 확인한다",
+      completionHint: "명세서 항목에 금액을 1개 이상 입력하면 자동 완료",
+      duration: "약 10분",
       steps: [
-        "매출(계약상 월급)과 매출총이익(실수령액)을 적는다",
-        "원가 항목별 금액을 적는다 (소득세·연금·보험·고용보험)",
-        "각 원가에 표시한다 — 불가피 / 최적화 가능 / 모름",
-        "'최적화 가능' 항목 하나를 골라 이번 달에 조정한다",
+        { text: "매출(계약상 월급)과 매출총이익(실수령액)을 적는다", where: "명세서 감사 · 항목" },
+        { text: "원가 항목별 금액을 적는다 (소득세·연금·보험·고용보험)", where: "명세서 감사 · 항목·금액" },
+        { text: "각 원가에 표시한다 — 불가피 / 최적화 가능 / 모름", where: "명세서 감사 · 구분" },
+        { text: "'최적화 가능' 항목 하나를 골라 이번 달에 조정한다", where: PAPER },
       ],
       target: "/tools/payslip",
-      targetLabel: "명세서 감사 도구",
+      targetLabel: "명세서 감사",
     },
     isComplete: (data) => data.tools.payslip.some((item) => item.amount > 0),
   },
@@ -152,14 +191,17 @@ export const COURSE_STEPS: CourseStep[] = [
     ],
     practice: {
       title: "고정비 일괄 결산의 밤",
+      goal: "매달 자동으로 빠져나가는 돈을 목록으로 만들고 정리한다",
+      completionHint: "고정비 항목에 금액을 1개 이상 입력하면 자동 완료",
+      duration: "약 15분",
       steps: [
-        "지난 3개월간 고정으로 빠져나간 항목을 모두 뽑는다",
-        "각 항목에 '없어도 되는가'를 묻는다 (답이 '글쎄요'면 해지 후보)",
-        "오늘 바로 해지할 수 있는 것부터 처리한다",
-        "남은 고정비의 월 합계와 연 합계(×12)를 적는다",
+        { text: "지난 3개월간 고정으로 빠져나간 항목을 모두 뽑는다", where: "고정비 결산 · 항목" },
+        { text: "각 항목에 '없어도 되는가'를 묻는다 (답이 '글쎄요'면 해지 후보)", where: PAPER },
+        { text: "오늘 바로 해지할 수 있는 것부터 처리한다", where: PAPER },
+        { text: "남은 고정비의 월 합계와 연 합계(×12)를 적는다", where: "고정비 결산 · 합계(자동 계산)" },
       ],
       target: "/tools/fixed-costs",
-      targetLabel: "고정비 결산 도구",
+      targetLabel: "고정비 결산",
     },
     isComplete: (data) => data.tools.fixedCosts.some((item) => item.amount > 0),
   },
@@ -176,13 +218,15 @@ export const COURSE_STEPS: CourseStep[] = [
     ],
     practice: {
       title: "내 손익분기점 계산하기",
+      goal: "이번 달 최소한 벌어야 하는 금액을 계산한다",
+      completionHint: "매출과 고정비를 입력하면 자동 완료",
+      duration: "약 10분",
       steps: [
-        "매출총이익(실수령액)을 적는다",
-        "고정비 합계를 적는다",
-        "지난 3개월 변동비를 평균내어 적는다 (현금 지출 포함)",
-        "변동비율 = 변동비 ÷ 매출총이익",
-        "손익분기점 = 고정비 ÷ (1 − 변동비율)을 구하고 안전마진을 계산한다",
-        "'내 회사는 현재 (흑자/적자)이며 월 (금액)의 (안전마진/적자) 상태다'를 적는다",
+        { text: "매출총이익(실수령액)을 적는다", where: "손익분기점 계산기 · 매출" },
+        { text: "고정비 합계를 적는다", where: "손익분기점 계산기 · 고정비" },
+        { text: "지난 3개월 변동비를 평균내어 적는다 (현금 지출 포함)", where: "손익분기점 계산기 · 변동비" },
+        { text: "손익분기점과 안전마진을 확인한다", where: "손익분기점 계산기 · 자동 계산 결과" },
+        { text: "'내 회사는 현재 (흑자/적자)이며 월 (금액)의 (안전마진/적자) 상태다'를 적는다", where: PAPER },
       ],
       target: "/tools/bep",
       targetLabel: "손익분기점 계산기",
@@ -203,14 +247,17 @@ export const COURSE_STEPS: CourseStep[] = [
     ],
     practice: {
       title: "내 지출의 감정평가표 만들기",
+      goal: "지출을 비용·투자로 분류해 줄일 곳을 찾는다",
+      completionHint: "지출 항목에 금액을 1개 이상 입력하면 자동 완료",
+      duration: "약 15분",
       steps: [
-        "지난달 지출 중 10만 원 이상인 항목을 모두 뽑는다",
-        "각 항목에 표시한다 — 비용 / 유지보수비 / 투자",
-        "투자 항목의 월 합계를 계산한다",
-        "비용 중 '줄여도 삶의 질이 안 변하는 것'에 별표를 친다",
+        { text: "지난달 지출 중 10만 원 이상인 항목을 모두 뽑는다", where: "지출 감정평가 · 항목" },
+        { text: "각 항목에 표시한다 — 비용 / 유지보수비 / 투자", where: "지출 감정평가 · 구분" },
+        { text: "투자 항목의 월 합계를 계산한다", where: "지출 감정평가 · 합계(자동 계산)" },
+        { text: "비용 중 '줄여도 삶의 질이 안 변하는 것'에 별표를 친다", where: PAPER },
       ],
       target: "/tools/expense-review",
-      targetLabel: "지출 감정평가 도구",
+      targetLabel: "지출 감정평가",
     },
     isComplete: (data) =>
       data.tools.expenseReview.some((item) => item.amount > 0),
@@ -228,11 +275,14 @@ export const COURSE_STEPS: CourseStep[] = [
     ],
     practice: {
       title: "내 '감가상각 자산' 점검",
+      goal: "지금의 수입원이 몇 년 뒤에도 유효한지 점검하고 대체 자산을 정한다",
+      completionHint: "종이·메모로 하는 실습이라 직접 완료로 표시합니다",
+      duration: "약 15분",
       steps: [
-        "지금 나에게 수입을 만들어주는 자산(직책·플랫폼)을 적는다",
-        "그 자산의 남은 수명을 추정해본다 (몇 년 뒤에도 유효한가)",
-        "그것을 대체·보완할 무형자산(자격·기술·관계) 하나를 정한다",
-        "1년 뒤 확보할 목표를 한 줄로 적는다",
+        { text: "지금 나에게 수입을 만들어주는 자산(직책·플랫폼)을 적는다", where: PAPER },
+        { text: "그 자산의 남은 수명을 추정해본다 (몇 년 뒤에도 유효한가)", where: PAPER },
+        { text: "그것을 대체·보완할 무형자산(자격·기술·관계) 하나를 정한다", where: PAPER },
+        { text: "1년 뒤 확보할 목표를 한 줄로 적는다", where: PAPER },
       ],
     },
   },
@@ -249,15 +299,19 @@ export const COURSE_STEPS: CourseStep[] = [
     ],
     practice: {
       title: "내 자산의 전수조사",
+      goal: "빠뜨린 자산을 찾아 재무상태표를 실제에 가깝게 만든다",
+      startHint: "재무상태표에서 '첫 등기 시작'을 누르면 입력 화면이 열립니다",
+      completionHint: "자산 합계가 0보다 큰 재무상태표를 저장하면 자동 완료",
+      duration: "약 20분",
       steps: [
-        "유동자산 — 모든 금융 앱 잔고와 숨은 계좌를 찾아 적는다",
-        "고정자산 — 보증금(확정일자·등기부·보증보험), 5만 원 이상 물건의 중고 시세, 퇴직연금",
-        "투자자산 — 주식·코인·펀드의 현재 시가를 적는다",
-        "무형자산 — 자격증·기술과 연봉 프리미엄을 각주로 적는다",
-        "합계와 날짜를 적고 서명한다",
+        { text: "유동자산 — 모든 금융 앱 잔고와 숨은 계좌를 찾아 적는다", where: "재무상태표 · 유동자산" },
+        { text: "고정자산 — 보증금, 5만 원 이상 물건의 중고 시세, 퇴직연금", where: "재무상태표 · 고정자산" },
+        { text: "투자자산 — 주식·코인·펀드의 현재 시가를 적는다", where: "재무상태표 · 투자자산" },
+        { text: "무형자산 — 자격증·기술과 연봉 프리미엄을 각주로 적는다", where: PAPER },
+        { text: "합계와 날짜를 적고 서명한다", where: "재무상태표 · 기준일 (서명은 16장 연간 감사에서)" },
       ],
       target: "/balance-sheet",
-      targetLabel: "재무상태표 열기",
+      targetLabel: "재무상태표 입력",
     },
     isComplete: (data) =>
       data.balanceSheets.some((sheet) => calcBalanceSheet(sheet).totalAssets > 0),
@@ -275,15 +329,19 @@ export const COURSE_STEPS: CourseStep[] = [
     ],
     practice: {
       title: "내 부채의 이자율 정렬",
+      goal: "모든 빚을 이자율 순으로 정렬하고 1순위 상환 대상을 정한다",
+      startHint: "부채관리에서 '부채 추가'로 빚을 하나씩 등록합니다",
+      completionHint: "부채를 1건 이상 등록하면 자동 완료",
+      duration: "약 15분",
       steps: [
-        "모든 빚을 적는다 (학자금·카드·마이너스·신용대출·빌린 돈)",
-        "연 이자율을 적는다 (모르면 은행 앱에서 확인)",
-        "이자율이 높은 순으로 정렬한다",
-        "이번 달 상환 가능액에서 최소 상환액을 뺀 나머지를 1순위에 몰빵한다",
-        "새 빚 이자율 상한 원칙을 적고 서명한다",
+        { text: "모든 빚을 적는다 (학자금·카드·마이너스·신용대출·빌린 돈)", where: "부채관리 · 부채 추가" },
+        { text: "연 이자율을 적는다 (모르면 은행 앱에서 확인)", where: "부채관리 · 연 이자율" },
+        { text: "이자율이 높은 순으로 정렬한다", where: "부채관리 · 이자율 정렬(자동)" },
+        { text: "이번 달 상환 가능액에서 최소 상환액을 뺀 나머지를 1순위에 몰빵한다", where: "부채관리 · 추가 상환 시뮬레이션" },
+        { text: "새 빚 이자율 상한 원칙을 적고 서명한다", where: PAPER },
       ],
       target: "/debts",
-      targetLabel: "부채관리 열기",
+      targetLabel: "부채관리",
     },
     isComplete: (data) => data.debts.length > 0,
   },
@@ -300,16 +358,18 @@ export const COURSE_STEPS: CourseStep[] = [
     ],
     practice: {
       title: "내 자기자본 증가율 계산",
+      goal: "작년과 올해 자기자본을 비교해 증가율을 확인한다",
+      completionHint: "연간 기록을 2개 연도 이상 입력하면 자동 완료",
+      duration: "약 15분",
       steps: [
-        "작년 자기자본을 적는다 (작년 자산 − 작년 부채)",
-        "올해 자기자본을 적는다",
-        "증가액 = 올해 자기자본 − 작년 자기자본",
-        "증가율 = 증가액 ÷ 작년 자기자본 × 100",
-        "증가율이 0% 이하면 빚이 늘지 않았는지 먼저 점검한다",
-        "올해 목표 자기자본을 적고 서명한다",
+        { text: "작년 자기자본을 적는다 (작년 자산 − 작년 부채)", where: "연간 추적 · 연도별 자산·부채" },
+        { text: "올해 자기자본을 적는다", where: "연간 추적 · 연도별 자산·부채" },
+        { text: "증가액과 증가율을 확인한다", where: "연간 추적 · 자동 계산 결과" },
+        { text: "증가율이 0% 이하면 빚이 늘지 않았는지 먼저 점검한다", where: "부채관리 · 부채 잔액" },
+        { text: "올해 목표 자기자본을 적고 서명한다", where: PAPER },
       ],
       target: "/annual",
-      targetLabel: "연간 추적 열기",
+      targetLabel: "연간 추적",
     },
     isComplete: (data) => data.annualTrackings.length >= 2,
   },
@@ -326,14 +386,17 @@ export const COURSE_STEPS: CourseStep[] = [
     ],
     practice: {
       title: "이번 달 현금흐름 정리",
+      goal: "이익과 통장 잔고의 차이를 세 활동으로 설명한다",
+      completionHint: "현금흐름표를 1건 저장하면 자동 완료",
+      duration: "약 15분",
       steps: [
-        "영업활동 — 현금 유입(월급·부업)과 유출(고정비+변동비)",
-        "투자활동 — 적금·학원·투자로 나간 현금",
-        "재무활동 — 빚 상환과 카드 할부",
-        "순현금증가액 = 세 활동의 합계를 구하고 기초·기말 현금잔고를 적는다",
+        { text: "영업활동 — 현금 유입(월급·부업)과 유출(고정비+변동비)", where: "현금흐름표 · 영업활동" },
+        { text: "투자활동 — 적금·학원·투자로 나간 현금", where: "현금흐름표 · 투자활동" },
+        { text: "재무활동 — 빚 상환과 카드 할부", where: "현금흐름표 · 재무활동" },
+        { text: "순현금증가액과 기초·기말 현금잔고를 확인한다", where: "현금흐름표 · 자동 계산 결과" },
       ],
       target: "/cash-flow",
-      targetLabel: "현금흐름표 열기",
+      targetLabel: "현금흐름표 입력",
     },
     isComplete: (data) => data.cashFlows.length > 0,
   },
@@ -350,12 +413,14 @@ export const COURSE_STEPS: CourseStep[] = [
     ],
     practice: {
       title: "내 보험의 회계 분류",
+      goal: "매달 나가는 보험료를 비용과 자산으로 나눈다",
+      completionHint: "보험료를 1개 이상 입력하면 자동 완료",
+      duration: "약 20분",
       steps: [
-        "내 보험 목록을 적는다 (보험사·상품명·월 보험료·가입 연도)",
-        "각 보험을 분류한다 (보장성만 / 저축성만 / 혼합)",
-        "혼합 보험은 해약 환급금을 확인한다",
-        "보장료는 비용, 적립금은 자산으로 분리한다",
-        "'비용으로 잡히는 월 보험료 합계'를 적는다",
+        { text: "내 보험 목록을 적는다 (보험사·상품명·월 보험료·가입 연도)", where: "보험 회계 분류 · 항목" },
+        { text: "각 보험을 분류한다 (보장성 / 저축성 / 혼합)", where: "보험 회계 분류 · 구분" },
+        { text: "혼합 보험은 해약 환급금을 확인한다", where: "보험 회계 분류 · 해약환급금" },
+        { text: "'비용으로 잡히는 월 보험료 합계'를 확인한다", where: "보험 회계 분류 · 합계(자동 계산)" },
       ],
       target: "/tools/insurance",
       targetLabel: "보험 회계 분류",
@@ -376,12 +441,15 @@ export const COURSE_STEPS: CourseStep[] = [
     ],
     practice: {
       title: "내 투자 포트폴리오의 회계 처리",
+      goal: "보유 종목의 평가손익을 계산해 투자자산에 반영한다",
+      completionHint: "매수 금액 또는 시가를 1개 이상 입력하면 자동 완료",
+      duration: "약 20분",
       steps: [
-        "보유 종목과 매수 금액을 적는다",
-        "현재 시가(오늘 종가)를 적는다",
-        "평가손익 = 현재 시가 − 매수 금액",
-        "재무상태표의 투자자산에 현재 시가를 반영한다",
-        "투자 원칙 3가지를 적고 서명한다 (위반하면 그 달 투자 중단)",
+        { text: "보유 종목과 매수 금액을 적는다", where: "투자 포트폴리오 · 종목·매수 금액" },
+        { text: "현재 시가(오늘 종가)를 적는다", where: "투자 포트폴리오 · 현재 시가" },
+        { text: "평가손익을 확인한다", where: "투자 포트폴리오 · 자동 계산 결과" },
+        { text: "재무상태표의 투자자산에 현재 시가를 반영한다", where: "재무상태표 · 투자자산" },
+        { text: "투자 원칙 3가지를 적고 서명한다 (위반하면 그 달 투자 중단)", where: PAPER },
       ],
       target: "/tools/investments",
       targetLabel: "투자 포트폴리오",
@@ -404,12 +472,15 @@ export const COURSE_STEPS: CourseStep[] = [
     ],
     practice: {
       title: "올해 연말정산 시뮬레이션",
+      goal: "예상 환급액을 계산하고 그 돈의 용처를 미리 정한다",
+      completionHint: "예상 환급액을 0보다 크게 입력하면 자동 완료",
+      duration: "약 15분",
       steps: [
-        "작년 환급액(또는 추가 납부액)을 확인한다",
-        "올해 변동 사항을 체크한다 (이직·연봉 인상·보험 가입/해지·병원비)",
-        "예상 환급액을 계산한다 (연말정산 시뮬레이터)",
-        "환급금 용처를 미리 정한다 (소비 / 자산 / 부채)",
-        "영수증 수집 습관을 만든다 (스마트폰에 별도 폴더)",
+        { text: "작년 환급액(또는 추가 납부액)을 확인한다", where: "연말정산 시뮬레이션 · 작년 환급액" },
+        { text: "올해 변동 사항을 체크한다 (이직·연봉 인상·보험 가입/해지·병원비)", where: "연말정산 시뮬레이션 · 체크리스트" },
+        { text: "예상 환급액을 계산한다", where: "연말정산 시뮬레이션 · 자동 계산 결과" },
+        { text: "환급금 용처를 정한다 (소비 / 자산 / 부채)", where: "연말정산 시뮬레이션 · 용처" },
+        { text: "영수증 수집 습관을 만든다 (스마트폰에 별도 폴더)", where: PAPER },
       ],
       target: "/tools/tax-refund",
       targetLabel: "연말정산 시뮬레이션",
@@ -429,16 +500,19 @@ export const COURSE_STEPS: CourseStep[] = [
     ],
     practice: {
       title: "내 결산서에 감사의견 달기",
+      goal: "올해 결산서를 스스로 감사하고 서명한다",
+      completionHint: "연간 기록에 감사의견과 서명을 남기면 자동 완료",
+      duration: "약 20분",
       steps: [
-        "지난해 12월 31일 재무상태표를 꺼낸다",
-        "올해 12월 31일 재무상태표를 작성한다",
-        "두 장을 비교한다 (자기자본이 늘었는가)",
-        "스스로 감사의견을 단다 (솔직하게)",
-        "적정이 아니면 내년 계획을 세운다",
-        "날짜와 서명을 한다",
+        { text: "지난해 12월 31일 재무상태표를 꺼낸다", where: "연간 추적 · 작년 기록" },
+        { text: "올해 12월 31일 재무상태표를 작성한다", where: "재무상태표 · 기준일 12/31" },
+        { text: "두 장을 비교한다 (자기자본이 늘었는가)", where: "연간 추적 · 증가율(자동 계산)" },
+        { text: "스스로 감사의견을 단다 (솔직하게)", where: "연간 추적 · 감사의견" },
+        { text: "적정이 아니면 내년 계획을 세운다", where: PAPER },
+        { text: "날짜와 서명을 한다", where: "연간 추적 · 전자서명" },
       ],
       target: "/annual",
-      targetLabel: "연간 추적에서 서명",
+      targetLabel: "감사의견·서명",
     },
     isComplete: (data) =>
       data.annualTrackings.some(
@@ -457,9 +531,41 @@ export function stepIndex(id: string): number {
   return COURSE_STEPS.findIndex((step) => step.id === id);
 }
 
+/** 목록/스텝 화면에서 쓰는 실습 버튼 라벨 (목적지가 아니라 동작) */
+export function practiceCtaLabel(step: CourseStep): string {
+  return step.practice.ctaLabel ?? "실습하기";
+}
+
+export function nextStepOf(step: CourseStep): CourseStep | undefined {
+  const index = stepIndex(step.id);
+  return index >= 0 ? COURSE_STEPS[index + 1] : undefined;
+}
+
 export function resolveCompletion(step: CourseStep, data: AppData): boolean {
-  if (step.isComplete?.(data)) return true;
+  try {
+    if (step.isComplete?.(data)) return true;
+  } catch {
+    // 손상·구버전 데이터가 코스 화면 전체를 깨뜨리지 않도록 자동 판정만 건너뛴다.
+    // (수동 완료 표시는 그대로 동작한다)
+  }
   return data.courseProgress.completedSteps.includes(step.id);
+}
+
+/**
+ * 소개용 단계는 실습 "다음" 추천에서 건너뛴다.
+ * (프롤로그는 앱 입력이 없어 수동 완료 전까지 계속 미완료로 남으므로,
+ *  그대로 두면 1장을 끝내도 프롤로그를 계속 추천하게 된다)
+ */
+const INTRO_STEP_IDS = new Set<string>(["prologue"]);
+
+export function nextPracticeStep(data: AppData): CourseStep | undefined {
+  const practice = (step: CourseStep) =>
+    !INTRO_STEP_IDS.has(step.id) && !resolveCompletion(step, data);
+
+  return (
+    COURSE_STEPS.find(practice) ??
+    COURSE_STEPS.find((step) => !resolveCompletion(step, data))
+  );
 }
 
 export interface CourseStats {
@@ -471,7 +577,9 @@ export interface CourseStats {
 
 export function courseStats(data: AppData): CourseStats {
   const done = COURSE_STEPS.filter((step) => resolveCompletion(step, data)).length;
-  const next = COURSE_STEPS.find((step) => !resolveCompletion(step, data));
+
+  const next = nextPracticeStep(data);
+
   return {
     total: COURSE_TOTAL,
     done,

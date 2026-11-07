@@ -34,6 +34,12 @@ export interface AppState extends AppData {
    * 프로필까지 지우면 온보딩으로 돌아가 백업 복원 전에 다시 설정해야 하는 함정이 생긴다.
    */
   resetFinancialData: () => void;
+  /**
+   * 코스에서 "실습하기"로 넘어온 stepId. 실습 화면에서 완료 조건과 복귀 링크를 보여주는 용도로만
+   * 쓰이며 저장/동기화 대상이 아니다(toAppData에 포함되지 않는다).
+   */
+  courseFocus: string | null;
+  setCourseFocus: (stepId: string | null) => void;
 }
 
 const now = () => new Date().toISOString();
@@ -139,6 +145,10 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   resetFinancialData: () =>
     set((state) => ({ ...createDefaultAppData(), user: state.user, hydrated: true })),
+
+  courseFocus: null,
+
+  setCourseFocus: (stepId) => set({ courseFocus: stepId }),
 }));
 
 export function selectIncomeStatement(

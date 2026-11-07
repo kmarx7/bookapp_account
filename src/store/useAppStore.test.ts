@@ -68,6 +68,16 @@ describe("useAppStore", () => {
     ]);
   });
 
+  it("tracks the course practice focus without persisting it", () => {
+    useAppStore.getState().setCourseFocus("ch02");
+    expect(useAppStore.getState().courseFocus).toBe("ch02");
+    expect(Object.keys(toAppData(useAppStore.getState()))).not.toContain(
+      "courseFocus",
+    );
+    useAppStore.getState().setCourseFocus(null);
+    expect(useAppStore.getState().courseFocus).toBeNull();
+  });
+
   it("resets financial data while keeping the representative profile", () => {
     useAppStore.getState().setUser(user);
     useAppStore.getState().addDebt({

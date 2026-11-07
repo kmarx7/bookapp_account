@@ -7,7 +7,12 @@ import { Card, CardTitle } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Gauge } from "@/components/ui/Gauge";
 import { useAppStore } from "@/store/useAppStore";
-import { COURSE_STEPS, courseStats, resolveCompletion } from "@/lib/course";
+import {
+  COURSE_STEPS,
+  courseStats,
+  practiceCtaLabel,
+  resolveCompletion,
+} from "@/lib/course";
 
 export default function LearnPage() {
   const data = useAppStore();
@@ -35,10 +40,15 @@ export default function LearnPage() {
             href={`/learn/${stats.next.id}`}
             className="mt-4 flex items-center justify-between rounded-xl bg-brand-soft px-4 py-3 transition-colors hover:bg-border"
           >
-            <span className="text-sm font-medium text-brand">
-              다음 실습 · {stats.next.title}
+            <span className="min-w-0">
+              <span className="block text-sm font-semibold text-brand">
+                이어서 실습하기
+              </span>
+              <span className="mt-0.5 block truncate text-xs text-muted">
+                {stats.next.title} · {stats.next.practice.completionHint}
+              </span>
             </span>
-            <ChevronRight size={18} className="text-brand" />
+            <ChevronRight size={18} className="shrink-0 text-brand" />
           </Link>
         ) : (
           <p className="mt-4 text-sm text-positive">
@@ -65,10 +75,18 @@ export default function LearnPage() {
                             {step.title}
                           </p>
                           <p className="mt-1 text-xs text-muted">{step.summary}</p>
+                          <p className="mt-2 text-xs text-muted">
+                            {done
+                              ? `${step.practice.title} · 실습 완료`
+                              : `${practiceCtaLabel(step)} · ${step.practice.completionHint}`}
+                          </p>
                         </div>
-                        <Badge tone={done ? "positive" : "neutral"}>
-                          {done ? "완료" : "미완료"}
-                        </Badge>
+                        <div className="flex shrink-0 items-center gap-2">
+                          <Badge tone={done ? "positive" : "neutral"}>
+                            {done ? "완료" : "미완료"}
+                          </Badge>
+                          <ChevronRight size={16} className="text-muted" />
+                        </div>
                       </div>
                     </Card>
                   </Link>
