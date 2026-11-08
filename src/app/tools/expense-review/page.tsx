@@ -101,7 +101,7 @@ export default function ExpenseReviewPage() {
     <>
       <PageHeader
         title="지출 감정평가"
-        description="손익계산서에서 지출을 불러와 비용·유지보수비·투자로 분류합니다."
+        description="불러온 지출을 직접 비용·유지보수비·투자로 분류합니다. 1차 분류는 앱이 제안합니다."
         backHref="/tools"
       />
       <div className="grid gap-4 lg:grid-cols-2">
@@ -128,6 +128,12 @@ export default function ExpenseReviewPage() {
           >
             지출 항목
           </CardTitle>
+
+          <p className="mb-3 rounded-xl bg-surface-muted px-4 py-2 text-xs text-muted">
+            1차 분류는 앱이 제안합니다(불러온 항목은 손익계산서에서 넣은 칸 기준, 직접
+            추가한 항목은 이름 기준). 틀렸다면 각 행의 분류를 선택해서 바꾸세요 — 바꾼
+            값이 저장됩니다.
+          </p>
 
           <div className="flex flex-col gap-2">
             {items.length === 0 ? (
