@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import Link from "next/link";
+import { Download, Plus, Trash2 } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -13,7 +14,11 @@ import { PercentInput } from "@/components/forms/PercentInput";
 import { Sheet } from "@/components/statement/Sheet";
 import { ViewTabs, type SheetView } from "@/components/statement/ViewTabs";
 import { useAppStore } from "@/store/useAppStore";
-import { simulatePayoff, sortDebtsByRate } from "@/lib/calculations/debt";
+import {
+  debtsFromBalanceSheet,
+  simulatePayoff,
+  sortDebtsByRate,
+} from "@/lib/calculations/debt";
 import { formatDate, formatKRW } from "@/lib/format";
 import type { Debt } from "@/types";
 
@@ -36,8 +41,41 @@ export default function DebtsPage() {
   const addDebt = useAppStore((state) => state.addDebt);
   const updateDebt = useAppStore((state) => state.updateDebt);
   const removeDebt = useAppStore((state) => state.removeDebt);
+  const balanceSheets = useAppStore((state) => state.balanceSheets);
   const [extraPayment, setExtraPayment] = useState(0);
+  const [message, setMessage] = useState("");
   const [view, setView] = useState<SheetView>("input");
+
+  const latestSheet = [...balanceSheets].sort(
+    (a, b) => Date.parse(b.baseDate) - Date.parse(a.baseDate),
+  )[0];
+
+  function importFromSheet() {
+    if (!latestSheet) {
+      setMessage("불러올 재무상태표가 없습니다. 먼저 재무상태표를 작성해 주세요.");
+      return;
+    }
+
+    const rows = debtsFromBalanceSheet(latestSheet);
+    if (rows.length === 0) {
+      setMessage(`${formatDate(latestSheet.baseDate)} 재무상태표에 부채가 없습니다.`);
+      return;
+    }
+
+    const existing = new Set(debts.map((debt) => debt.name.trim()));
+    const added = rows.filter((row) => !existing.has(row.name));
+    if (added.length === 0) {
+      setMessage("이미 모두 불러왔습니다.");
+      return;
+    }
+
+    for (const row of added) {
+      addDebt({ ...blankDebt(userId), name: row.name, balance: row.balance });
+    }
+    setMessage(
+      `${formatDate(latestSheet.baseDate)} 재무상태표에서 ${added.length}건을 불러왔습니다. 이자율·월 상환액을 채워 주세요.`,
+    );
+  }
 
   const sorted = sortDebtsByRate(debts);
   const totalBalance = sorted.reduce((acc, debt) => acc + (debt.balance || 0), 0);
@@ -53,16 +91,34 @@ export default function DebtsPage() {
         title="부채관리"
         description="이자율이 높은 부채부터 갚는 것이 유리합니다."
         action={
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => addDebt(blankDebt(userId))}
-          >
-            <Plus size={16} />
-            부채 추가
-          </Button>
+          <span className="flex items-center gap-2">
+            <Button variant="secondary" size="sm" onClick={importFromSheet}>
+              <Download size={16} />
+              불러오기
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => addDebt(blankDebt(userId))}
+            >
+              <Plus size={16} />
+              부채 추가
+            </Button>
+          </span>
         }
       />
+
+      {message ? (
+        <p className="mb-3 text-xs text-muted">{message}</p>
+      ) : null}
+      {!latestSheet ? (
+        <p className="mb-3 text-xs text-muted">
+          <Link href="/balance-sheet" className="text-brand hover:underline">
+            재무상태표 작성하러 가기
+          </Link>{" "}
+          — 부채 칸을 채워두면 여기서 한 번에 불러올 수 있습니다.
+        </p>
+      ) : null}
 
       {debts.length === 0 ? (
         <EmptyState
