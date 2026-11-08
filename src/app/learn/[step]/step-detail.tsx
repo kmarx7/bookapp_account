@@ -176,7 +176,7 @@ export function StepDetail({ stepId }: { stepId: string }) {
           </p>
         </Card>
 
-        {/* 5) 완료 처리 — 자동 확인 스텝은 '무엇을 채우면 되는지'를 그대로 보여준다 */}
+        {/* 5) 완료 처리 — 직접 완료로 표시하거나, 조건을 채우러 다시 가거나 */}
         <Card>
           <CardTitle>완료 처리</CardTitle>
           {auto ? (
@@ -187,21 +187,40 @@ export function StepDetail({ stepId }: { stepId: string }) {
           ) : (
             <>
               <p className="text-sm text-muted">
-                {step.isComplete
-                  ? `아직 완료 조건이 비어 있습니다 · ${practice.completionHint}`
-                  : manual
-                    ? "직접 완료로 표시했습니다."
+                {manual
+                  ? "직접 완료로 표시했습니다."
+                  : step.isComplete
+                    ? `아직 완료 조건이 비어 있습니다 · ${practice.completionHint}`
                     : "종이·메모로 마쳤다면 직접 완료로 표시하세요."}
               </p>
-              <div className="mt-3">
+
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                {practice.target ? (
+                  <Link
+                    href={practice.target}
+                    onClick={() => setCourseFocus(resolvedStepId)}
+                    className="inline-flex h-9 items-center gap-2 rounded-xl bg-brand px-3 text-sm font-medium text-white transition-colors hover:bg-brand-dark"
+                  >
+                    완료 조건 채우러 가기
+                    <ArrowRight size={16} />
+                  </Link>
+                ) : null}
+
                 <Button
                   size="sm"
-                  variant={manual ? "secondary" : "primary"}
+                  variant={practice.target || manual ? "secondary" : "primary"}
                   onClick={() => setStepComplete(step.id, !manual)}
                 >
                   {manual ? "완료 취소" : "완료로 표시"}
                 </Button>
               </div>
+
+              {practice.target ? (
+                <p className="mt-2 text-xs text-muted">
+                  {practice.targetLabel} 화면에서 입력하면 자동으로 완료됩니다. 종이·메모로
+                  진행했다면 “완료로 표시”를 눌러 주세요.
+                </p>
+              ) : null}
             </>
           )}
         </Card>
