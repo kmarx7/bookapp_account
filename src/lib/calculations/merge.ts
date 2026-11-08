@@ -29,6 +29,12 @@ export function mergeAppData(local: AppData, remote: AppData): AppData {
     debts: mergeCollection(local.debts, remote.debts),
     annualTrackings: mergeCollection(local.annualTrackings, remote.annualTrackings),
     courseProgress: mergeCourseProgress(local, remote),
+    calendarDone: [
+      ...new Set([
+        ...(local.calendarDone ?? []),
+        ...(remote.calendarDone ?? []),
+      ]),
+    ],
     tools: mergeTools(local, remote),
   };
 }

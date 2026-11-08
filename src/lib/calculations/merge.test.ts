@@ -69,3 +69,14 @@ describe("mergeAppData", () => {
     expect(mergeAppData(remote, local).user?.nickname).toBe("새 이름");
   });
 });
+
+describe("calendar checks", () => {
+  it("완료 표시는 합집합으로 병합한다", () => {
+    const local = data({ calendarDone: ["2026:vat-2"] });
+    const remote = data({ calendarDone: ["2026:vat-2", "2026:income-tax"] });
+
+    expect(new Set(mergeAppData(local, remote).calendarDone)).toEqual(
+      new Set(["2026:vat-2", "2026:income-tax"]),
+    );
+  });
+});

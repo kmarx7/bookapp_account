@@ -47,6 +47,8 @@ export interface AppState extends AppData {
    * 수동 완료 표시도 함께 해제해 그 단계가 "미완료"로 돌아간다.
    */
   clearStepData: (stepId: string, scope: CourseResetScope) => void;
+  /** 회계 달력 일정의 완료 표시를 켜고 끈다 */
+  toggleCalendarDone: (key: string) => void;
 }
 
 const now = () => new Date().toISOString();
@@ -159,6 +161,14 @@ export const useAppStore = create<AppState>((set, get) => ({
     storeCourseFocus(stepId);
     set({ courseFocus: stepId });
   },
+
+  toggleCalendarDone: (key) =>
+    set((state) => {
+      const done = new Set(state.calendarDone);
+      if (done.has(key)) done.delete(key);
+      else done.add(key);
+      return { calendarDone: [...done] };
+    }),
 
   clearStepData: (stepId, scope) => {
     const courseProgress = {

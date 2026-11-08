@@ -135,6 +135,8 @@ export interface AppData {
   debts: Debt[];
   annualTrackings: AnnualTracking[];
   courseProgress: CourseProgress;
+  /** 회계 달력에서 "완료"로 표시한 일정 키(`${year}:${eventId}`) */
+  calendarDone: string[];
   tools: ToolData;
 }
 

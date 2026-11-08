@@ -58,6 +58,7 @@ describe("useAppStore", () => {
     expect(keys).toEqual([
       "annualTrackings",
       "balanceSheets",
+      "calendarDone",
       "cashFlows",
       "courseProgress",
       "debts",
@@ -145,5 +146,15 @@ describe("clearStepData", () => {
     expect(useAppStore.getState().courseProgress.completedSteps).not.toContain(
       "ch08",
     );
+  });
+});
+
+describe("calendar completion", () => {
+  it("일정 완료 표시를 켜고 끈다", () => {
+    useAppStore.getState().toggleCalendarDone("2026:vat-2");
+    expect(useAppStore.getState().calendarDone).toEqual(["2026:vat-2"]);
+
+    useAppStore.getState().toggleCalendarDone("2026:vat-2");
+    expect(useAppStore.getState().calendarDone).toEqual([]);
   });
 });

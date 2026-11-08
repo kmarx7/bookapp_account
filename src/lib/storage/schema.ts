@@ -26,6 +26,7 @@ export function createDefaultAppData(): AppData {
     debts: [],
     annualTrackings: [],
     courseProgress: { completedSteps: [], updatedAt: "" },
+    calendarDone: [],
     tools: createDefaultTools(),
   };
 }
@@ -48,6 +49,7 @@ export function toAppData(source: AppData): AppData {
     debts: source.debts,
     annualTrackings: source.annualTrackings,
     courseProgress: source.courseProgress,
+    calendarDone: source.calendarDone ?? [],
     tools: source.tools,
   };
 }
@@ -63,6 +65,7 @@ export function normalize(source: Partial<AppData>): AppData {
     debts: source.debts ?? [],
     annualTrackings: source.annualTrackings ?? [],
     courseProgress: source.courseProgress ?? { completedSteps: [], updatedAt: "" },
+    calendarDone: source.calendarDone ?? [],
     tools: source.tools ? { ...defaults, ...source.tools } : defaults,
   };
 }

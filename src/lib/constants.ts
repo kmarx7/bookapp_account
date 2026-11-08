@@ -10,7 +10,7 @@ import type {
   VariableCosts,
 } from "@/types";
 
-export const SCHEMA_VERSION = 4;
+export const SCHEMA_VERSION = 5;
 export const STORAGE_KEY = "bookapp-account";
 
 export const FIXED_COST_LABELS: Record<keyof FixedCosts, string> = {
