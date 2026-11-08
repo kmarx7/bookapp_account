@@ -1,4 +1,5 @@
-const CACHE = "bookapp-v1";
+// 캐시 이름을 올리면 activate 단계에서 이전 캐시를 모두 지운다(배포 후 옛 에셋 정리).
+const CACHE = "bookapp-v2";
 const APP_SHELL = ["/", "/manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {
