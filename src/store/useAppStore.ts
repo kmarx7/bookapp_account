@@ -3,6 +3,8 @@ import type {
   AnnualTracking,
   AppData,
   BalanceSheet,
+  CalendarCustomEvent,
+  CalendarPayment,
   CashFlow,
   Debt,
   IncomeStatement,
@@ -49,6 +51,20 @@ export interface AppState extends AppData {
   clearStepData: (stepId: string, scope: CourseResetScope) => void;
   /** 회계 달력 일정의 완료 표시를 켜고 끈다 */
   toggleCalendarDone: (key: string) => void;
+  /** 세금 일정의 예상·납부 금액을 기록한다 */
+  setCalendarPayment: (
+    id: string,
+    patch: Partial<Pick<CalendarPayment, "expected" | "paid">>,
+  ) => void;
+  /** 사용자 일정 추가 */
+  addCustomEvent: (input: {
+    id: string;
+    month: number;
+    day?: number;
+    title: string;
+  }) => void;
+  /** 사용자 일정 삭제 */
+  removeCustomEvent: (id: string) => void;
 }
 
 const now = () => new Date().toISOString();
@@ -169,6 +185,35 @@ export const useAppStore = create<AppState>((set, get) => ({
       else done.add(key);
       return { calendarDone: [...done] };
     }),
+
+  setCalendarPayment: (id, patch) =>
+    set((state) => {
+      const existing = state.calendarPayments.find((item) => item.id === id);
+      const next: CalendarPayment = {
+        id,
+        expected: patch.expected ?? existing?.expected ?? 0,
+        paid: patch.paid ?? existing?.paid ?? 0,
+        updatedAt: now(),
+      };
+      return { calendarPayments: upsertById(state.calendarPayments, next) };
+    }),
+
+  addCustomEvent: (input) =>
+    set((state) => {
+      const next: CalendarCustomEvent = {
+        id: input.id,
+        month: input.month,
+        day: input.day,
+        title: input.title,
+        updatedAt: now(),
+      };
+      return { calendarCustom: upsertById(state.calendarCustom, next) };
+    }),
+
+  removeCustomEvent: (id) =>
+    set((state) => ({
+      calendarCustom: state.calendarCustom.filter((item) => item.id !== id),
+    })),
 
   clearStepData: (stepId, scope) => {
     const courseProgress = {

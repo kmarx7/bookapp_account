@@ -1,3 +1,5 @@
+import type { CalendarCustomEvent } from "@/types";
+
 export type BusinessProfile =
   | "all"
   | "employee"
@@ -21,12 +23,13 @@ export const BUSINESS_PROFILE_LABELS: Record<BusinessProfile, string> = {
   corporate: "법인",
 };
 
-export type DiaryTag = "tax" | "closing" | "living";
+export type DiaryTag = "tax" | "closing" | "living" | "custom";
 
 export const DIARY_TAG_LABELS: Record<DiaryTag, string> = {
   tax: "세금",
   closing: "결산",
   living: "생활",
+  custom: "내 일정",
 };
 
 const EMPLOYEE: BusinessProfile[] = ["employee"];
@@ -219,6 +222,8 @@ export interface DiaryFilter {
 
 function matchesFilter(event: DiaryEvent, filter: DiaryFilter): boolean {
   if (!filter.living && event.tag === "living") return false;
+  // 사용자 일정은 내 상황과 무관하게 항상 보여준다
+  if (event.tag === "custom") return true;
   if (filter.profile !== "all" && !event.appliesTo.includes(filter.profile)) {
     return false;
   }
@@ -228,10 +233,25 @@ function matchesFilter(event: DiaryEvent, filter: DiaryFilter): boolean {
 export function eventsForMonth(
   month: number,
   filter: DiaryFilter,
+  extra: DiaryEvent[] = [],
 ): DiaryEvent[] {
-  return TAX_CALENDAR.filter(
-    (event) => event.month === month && matchesFilter(event, filter),
-  ).sort((a, b) => (a.day ?? 99) - (b.day ?? 99));
+  return [...TAX_CALENDAR, ...extra]
+    .filter((event) => event.month === month && matchesFilter(event, filter))
+    .sort((a, b) => (a.day ?? 99) - (b.day ?? 99));
+}
+
+/** 사용자가 추가한 일정을 달력 이벤트로 바꾼다 */
+export function customEventToDiary(custom: CalendarCustomEvent): DiaryEvent {
+  return {
+    id: custom.id,
+    month: custom.month,
+    day: custom.day,
+    short: custom.title,
+    title: custom.title,
+    note: "내 일정",
+    tag: "custom",
+    appliesTo: ALL,
+  };
 }
 
 /** 완료 표시 키: 연도 + 일정 ID */
@@ -261,6 +281,7 @@ export interface NextDiaryEvent {
 export function nextEvent(
   from: Date,
   filter: DiaryFilter,
+  extra: DiaryEvent[] = [],
 ): NextDiaryEvent | null {
   const startOfToday = new Date(
     from.getFullYear(),
@@ -271,7 +292,7 @@ export function nextEvent(
 
   for (let offset = 0; offset < 12 && !best; offset += 1) {
     const cursor = new Date(from.getFullYear(), from.getMonth() + offset, 1);
-    for (const event of eventsForMonth(cursor.getMonth() + 1, filter)) {
+    for (const event of eventsForMonth(cursor.getMonth() + 1, filter, extra)) {
       const date = eventDate(event, cursor.getFullYear());
       if (date.getTime() < startOfToday.getTime()) continue;
 
@@ -285,4 +306,41 @@ export function nextEvent(
   }
 
   return best;
+}
+
+export interface OverdueEvent {
+  event: DiaryEvent;
+  date: Date;
+  daysLeft: number;
+}
+
+/** 올해 이미 지났는데 완료 표시가 없는 일정 */
+export function overdueEvents(
+  from: Date,
+  filter: DiaryFilter,
+  done: ReadonlySet<string>,
+  extra: DiaryEvent[] = [],
+): OverdueEvent[] {
+  const startOfToday = new Date(
+    from.getFullYear(),
+    from.getMonth(),
+    from.getDate(),
+  );
+
+  return [...TAX_CALENDAR, ...extra]
+    .filter((event) => matchesFilter(event, filter))
+    .map((event) => ({ event, date: eventDate(event, from.getFullYear()) }))
+    .filter(
+      ({ event, date }) =>
+        date.getTime() < startOfToday.getTime() &&
+        !done.has(calendarKey(from.getFullYear(), event.id)),
+    )
+    .map(({ event, date }) => ({
+      event,
+      date,
+      daysLeft: Math.round(
+        (date.getTime() - startOfToday.getTime()) / 86_400_000,
+      ),
+    }))
+    .sort((a, b) => a.date.getTime() - b.date.getTime());
 }

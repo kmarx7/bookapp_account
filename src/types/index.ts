@@ -126,6 +126,22 @@ export interface CourseProgress {
   updatedAt: string;
 }
 
+export interface CalendarPayment {
+  /** `${year}:${eventId}` */
+  id: string;
+  expected: number;
+  paid: number;
+  updatedAt: string;
+}
+
+export interface CalendarCustomEvent {
+  id: string;
+  month: number;
+  day?: number;
+  title: string;
+  updatedAt: string;
+}
+
 export interface AppData {
   schemaVersion: number;
   user: User | null;
@@ -137,6 +153,10 @@ export interface AppData {
   courseProgress: CourseProgress;
   /** 회계 달력에서 "완료"로 표시한 일정 키(`${year}:${eventId}`) */
   calendarDone: string[];
+  /** 세금 일정의 예상·납부 금액 */
+  calendarPayments: CalendarPayment[];
+  /** 사용자가 추가한 일정 */
+  calendarCustom: CalendarCustomEvent[];
   tools: ToolData;
 }
 

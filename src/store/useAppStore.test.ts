@@ -58,7 +58,9 @@ describe("useAppStore", () => {
     expect(keys).toEqual([
       "annualTrackings",
       "balanceSheets",
+      "calendarCustom",
       "calendarDone",
+      "calendarPayments",
       "cashFlows",
       "courseProgress",
       "debts",
@@ -156,5 +158,35 @@ describe("calendar completion", () => {
 
     useAppStore.getState().toggleCalendarDone("2026:vat-2");
     expect(useAppStore.getState().calendarDone).toEqual([]);
+  });
+});
+
+describe("calendar records", () => {
+  it("세금 예상·납부 금액을 저장하고 갱신한다", () => {
+    useAppStore
+      .getState()
+      .setCalendarPayment("2026:vat-2", { expected: 120_000 });
+    useAppStore.getState().setCalendarPayment("2026:vat-2", { paid: 100_000 });
+
+    const payments = useAppStore.getState().calendarPayments;
+    expect(payments).toHaveLength(1);
+    expect(payments[0]).toMatchObject({
+      id: "2026:vat-2",
+      expected: 120_000,
+      paid: 100_000,
+    });
+  });
+
+  it("사용자 일정을 추가하고 삭제한다", () => {
+    useAppStore.getState().addCustomEvent({
+      id: "custom-1",
+      month: 3,
+      day: 5,
+      title: "보험 갱신",
+    });
+    expect(useAppStore.getState().calendarCustom).toHaveLength(1);
+
+    useAppStore.getState().removeCustomEvent("custom-1");
+    expect(useAppStore.getState().calendarCustom).toHaveLength(0);
   });
 });

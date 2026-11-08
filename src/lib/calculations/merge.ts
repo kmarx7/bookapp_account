@@ -35,6 +35,14 @@ export function mergeAppData(local: AppData, remote: AppData): AppData {
         ...(remote.calendarDone ?? []),
       ]),
     ],
+    calendarPayments: mergeCollection(
+      local.calendarPayments ?? [],
+      remote.calendarPayments ?? [],
+    ),
+    calendarCustom: mergeCollection(
+      local.calendarCustom ?? [],
+      remote.calendarCustom ?? [],
+    ),
     tools: mergeTools(local, remote),
   };
 }

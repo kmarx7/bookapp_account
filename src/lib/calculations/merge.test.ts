@@ -80,3 +80,50 @@ describe("calendar checks", () => {
     );
   });
 });
+
+describe("calendar payments and custom events", () => {
+  it("금액 기록은 키 단위로 최신 updatedAt을 남긴다", () => {
+    const local = data({
+      calendarPayments: [
+        {
+          id: "2026:vat-2",
+          expected: 100,
+          paid: 0,
+          updatedAt: "2026-01-02T00:00:00.000Z",
+        },
+      ],
+    });
+    const remote = data({
+      calendarPayments: [
+        {
+          id: "2026:vat-2",
+          expected: 100,
+          paid: 90,
+          updatedAt: "2026-01-01T00:00:00.000Z",
+        },
+      ],
+    });
+
+    expect(mergeAppData(local, remote).calendarPayments).toHaveLength(1);
+    expect(mergeAppData(local, remote).calendarPayments[0].paid).toBe(0);
+  });
+
+  it("사용자 일정은 id 단위로 합친다", () => {
+    const local = data({
+      calendarCustom: [
+        { id: "custom-1", month: 3, title: "A", updatedAt: "2026-01-01T00:00:00.000Z" },
+      ],
+    });
+    const remote = data({
+      calendarCustom: [
+        { id: "custom-2", month: 4, title: "B", updatedAt: "2026-01-01T00:00:00.000Z" },
+      ],
+    });
+
+    expect(
+      mergeAppData(local, remote)
+        .calendarCustom.map((item) => item.id)
+        .sort(),
+    ).toEqual(["custom-1", "custom-2"]);
+  });
+});

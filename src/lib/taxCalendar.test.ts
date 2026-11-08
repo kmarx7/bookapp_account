@@ -6,9 +6,11 @@ import {
   MONTHLY_ROUTINE,
   TAX_CALENDAR,
   calendarKey,
+  customEventToDiary,
   eventDate,
   eventsForMonth,
   nextEvent,
+  overdueEvents,
 } from "@/lib/taxCalendar";
 
 const ALL_VIEW = { profile: "all" as const, living: true };
@@ -120,5 +122,59 @@ describe("tax calendar", () => {
     expect(BUSINESS_PROFILE_LABELS["sole-general"]).toBe("개인 일반과세");
     expect(DIARY_TAG_LABELS.living).toBe("생활");
     expect(MONTHLY_ROUTINE.title.length).toBeGreaterThan(0);
+  });
+});
+
+describe("custom events and overdue", () => {
+  const custom = {
+    id: "custom-1",
+    month: 3,
+    day: 5,
+    title: "보험 갱신",
+    updatedAt: "2026-01-01T00:00:00.000Z",
+  };
+
+  it("사용자 일정은 내 상황과 무관하게 그 달에 보인다", () => {
+    const extra = [customEventToDiary(custom)];
+    const employee = { profile: "employee" as const, living: false };
+
+    expect(eventsForMonth(3, employee, extra).map((event) => event.id)).toEqual([
+      "custom-1",
+    ]);
+  });
+
+  it("다음 일정에 사용자 일정도 포함된다", () => {
+    const extra = [customEventToDiary(custom)];
+    const next = nextEvent(
+      new Date(2026, 2, 1),
+      { profile: "employee", living: false },
+      extra,
+    );
+
+    expect(next?.event.id).toBe("custom-1");
+    expect(next?.daysLeft).toBe(4);
+  });
+
+  it("올해 지난 미완료 일정을 날짜 순으로 찾는다", () => {
+    const from = new Date(2026, 2, 20); // 3월 20일
+    const overdue = overdueEvents(from, { profile: "all", living: true }, new Set());
+
+    expect(overdue.map((item) => item.event.id)).toEqual([
+      "vat-2",
+      "closing-prev",
+      "year-end-tax",
+      "withholding",
+    ]);
+  });
+
+  it("완료 표시한 일정은 지난 일정에서 뺀다", () => {
+    const from = new Date(2026, 2, 20);
+    const done = new Set(
+      ["vat-2", "closing-prev", "year-end-tax", "withholding"].map((id) =>
+        calendarKey(2026, id),
+      ),
+    );
+
+    expect(overdueEvents(from, { profile: "all", living: true }, done)).toEqual([]);
   });
 });
