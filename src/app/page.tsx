@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import Link from "next/link";
 import { Plus, ChevronRight } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { OnboardingGuide } from "@/components/home/OnboardingGuide";
 import { Card, CardTitle } from "@/components/ui/Card";
 import { StatBlock, toneForValue } from "@/components/ui/StatBlock";
 import { Badge } from "@/components/ui/Badge";
@@ -71,6 +72,8 @@ export default function HomePage() {
         title={`${user?.nickname ?? "대표"}님의 결산`}
         description={user ? `설립일 ${formatDate(user.foundedAt)}` : undefined}
       />
+
+      <OnboardingGuide />
 
       <div className="mb-4">
         <MonthSwitcher label={label} onPrev={prev} onNext={next} />
