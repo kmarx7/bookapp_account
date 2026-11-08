@@ -74,6 +74,14 @@ export default function HomePage() {
       />
 
       <div className="mb-4">
+        <YearDiary
+          year={year}
+          selectedMonth={month}
+          onSelect={(nextMonth) => goTo(year, nextMonth)}
+        />
+      </div>
+
+      <div className="mb-4">
         <MonthSwitcher label={label} onPrev={prev} onNext={next} />
       </div>
 
@@ -125,12 +133,6 @@ export default function HomePage() {
             />
           )}
         </Card>
-
-        <YearDiary
-          year={year}
-          selectedMonth={month}
-          onSelect={(nextMonth) => goTo(year, nextMonth)}
-        />
 
         <Card>
           <CardTitle hint="최근 6개월">손익 추이</CardTitle>
