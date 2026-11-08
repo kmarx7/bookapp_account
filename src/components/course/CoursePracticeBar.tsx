@@ -33,7 +33,10 @@ export function CoursePracticeBar() {
   const focusId = storeFocus ?? storedFocus;
   const step = focusId ? stepById(focusId) : undefined;
 
-  if (!hydrated || !step || pathname.startsWith("/learn")) return null;
+  // 실습 대상 화면에서만 보인다. 다른 화면으로 이동하면 조용히 사라지고,
+  // 대상 화면으로 돌아오면 세션에 남은 문맥으로 다시 나타난다.
+  const onTarget = step?.practice.target === pathname;
+  if (!hydrated || !step || !onTarget) return null;
 
   const done = resolveCompletion(step, data);
   const next = nextStepOf(step);
