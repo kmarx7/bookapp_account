@@ -153,11 +153,15 @@ export interface FixedCostItem {
   cancelCandidate?: boolean;
 }
 
+export type ExpenseCategory = "cost" | "maintenance" | "investment";
+
 export interface ExpenseItem {
   id: string;
   name: string;
   amount: number;
-  category: "cost" | "maintenance" | "investment";
+  category: ExpenseCategory;
+  /** 비용 중 "줄여도 삶의 질이 안 변하는" 후보 */
+  cutCandidate?: boolean;
 }
 
 export interface InsuranceItem {
@@ -182,6 +186,10 @@ export interface ExpenseDraft {
   id: string;
   name: string;
   amount: number;
+  /** 수동 분류. 없으면 이름으로 자동 분류한다(기존 저장 데이터 호환). */
+  category?: ExpenseCategory;
+  /** 줄일 후보 별표 */
+  cutCandidate?: boolean;
 }
 
 export interface ToolData {

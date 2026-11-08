@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { calcBEP } from "@/lib/calculations/bep";
-import { classifyExpense, summarizeExpenses } from "@/lib/calculations/expenseReview";
+import {
+  classifyExpense,
+  expenseItemsFromStatement,
+  resolveExpenseItems,
+  summarizeExpenses,
+} from "@/lib/calculations/expenseReview";
+import { createIncomeStatement } from "@/lib/calculations/incomeStatement";
 import { analyzePayslip } from "@/lib/calculations/payslip";
 import { summarizeFixedCosts } from "@/lib/calculations/fixedCosts";
 
@@ -72,5 +78,57 @@ describe("classifyExpense", () => {
     ]);
     expect(summary.total).toBe(760_000);
     expect(summary.ratio.investment).toBeCloseTo(300_000 / 760_000, 6);
+  });
+});
+
+describe("expense review: 불러오기와 수동 분류", () => {
+  it("expenseItemsFromStatement: 10만 원 이상 항목만 뽑는다", () => {
+    const base = createIncomeStatement("u1", 2026, 11);
+    const statement = {
+      ...base,
+      fixedCosts: { ...base.fixedCosts, rent: 500_000, communication: 60_000 },
+      variableCosts: { ...base.variableCosts, food: 400_000 },
+      investmentCosts: { ...base.investmentCosts, education: 100_000 },
+    };
+
+    const rows = expenseItemsFromStatement(statement);
+
+    expect(rows.map((row) => row.name)).toEqual(["월세", "식비", "학원"]);
+    expect(rows.find((row) => row.name === "월세")?.category).toBe("cost");
+    expect(rows.find((row) => row.name === "학원")?.category).toBe("investment");
+  });
+
+  it("expenseItemsFromStatement: 임계값을 바꿀 수 있다", () => {
+    const base = createIncomeStatement("u1", 2026, 11);
+    const statement = {
+      ...base,
+      fixedCosts: { ...base.fixedCosts, communication: 60_000 },
+    };
+
+    expect(expenseItemsFromStatement(statement)).toHaveLength(0);
+    expect(
+      expenseItemsFromStatement(statement, 50_000).map((row) => row.name),
+    ).toEqual(["통신"]);
+  });
+
+  it("resolveExpenseItems: 수동 분류가 자동 분류보다 우선한다", () => {
+    const items = resolveExpenseItems([
+      { id: "1", name: "적금 납입", amount: 300_000 },
+      { id: "2", name: "적금 납입", amount: 100_000, category: "cost" },
+    ]);
+
+    expect(items[0].category).toBe("investment");
+    expect(items[1].category).toBe("cost");
+  });
+
+  it("summarizeExpenses: 줄일 후보 합계를 계산한다", () => {
+    const summary = summarizeExpenses([
+      { id: "a", name: "구독", amount: 20_000, category: "maintenance", cutCandidate: true },
+      { id: "b", name: "식비", amount: 300_000, category: "cost", cutCandidate: true },
+      { id: "c", name: "학원", amount: 100_000, category: "investment" },
+    ]);
+
+    expect(summary.cut).toEqual({ count: 2, total: 320_000 });
+    expect(summary.byCategory.cost).toBe(300_000);
   });
 });
