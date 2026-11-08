@@ -28,6 +28,22 @@ export interface CoursePractice {
   ctaLabel?: string;
 }
 
+/** 이 실습에서 "데이터 지우고 다시 하기"로 초기화할 대상 */
+export type CourseResetScope =
+  | "manual"
+  | "incomeStatements"
+  | "balanceSheets"
+  | "cashFlows"
+  | "debts"
+  | "annualTrackings"
+  | "tools.payslip"
+  | "tools.fixedCosts"
+  | "tools.bep"
+  | "tools.expenseReview"
+  | "tools.insurance"
+  | "tools.investments"
+  | "tools.taxRefund";
+
 export interface CourseStep {
   id: string;
   chapter: number | null;
@@ -37,6 +53,8 @@ export interface CourseStep {
   concepts: string[];
   practice: CoursePractice;
   isComplete?: (data: AppData) => boolean;
+  /** 이 실습이 쓰는 데이터. "다시 하기"에서 이 범위만 초기화한다. */
+  resetScope: CourseResetScope;
 }
 
 const PART_1 = "1부 · 나는 나라는 회사의 대표다";
@@ -49,6 +67,7 @@ const PAPER = "종이·메모 (앱 밖)";
 export const COURSE_STEPS: CourseStep[] = [
   {
     id: "prologue",
+    resetScope: "manual",
     chapter: null,
     partTitle: "프롤로그",
     title: "가계부는 쓰는데 왜 통장이 마르는가",
@@ -72,6 +91,7 @@ export const COURSE_STEPS: CourseStep[] = [
   },
   {
     id: "ch01",
+    resetScope: "balanceSheets",
     chapter: 1,
     partTitle: PART_1,
     title: "1장. 1인 가구는 '임시 거처'가 아니라 '기업'이다",
@@ -99,6 +119,7 @@ export const COURSE_STEPS: CourseStep[] = [
   },
   {
     id: "ch02",
+    resetScope: "incomeStatements",
     chapter: 2,
     partTitle: PART_1,
     title: "2장. 대표님, 손익계산서부터 보시죠",
@@ -126,6 +147,7 @@ export const COURSE_STEPS: CourseStep[] = [
   },
   {
     id: "ch03",
+    resetScope: "balanceSheets",
     chapter: 3,
     partTitle: PART_1,
     title: "3장. 회사 설립하기: 나라는 법인 등록",
@@ -153,6 +175,7 @@ export const COURSE_STEPS: CourseStep[] = [
   },
   {
     id: "ch04",
+    resetScope: "tools.payslip",
     chapter: 4,
     partTitle: PART_2,
     title: "4장. 월급은 매출이 아니라 매출총이익이다",
@@ -180,6 +203,7 @@ export const COURSE_STEPS: CourseStep[] = [
   },
   {
     id: "ch05",
+    resetScope: "tools.fixedCosts",
     chapter: 5,
     partTitle: PART_2,
     title: "5장. 고정비와 변동비, 쏘카처럼 사는 법",
@@ -207,6 +231,7 @@ export const COURSE_STEPS: CourseStep[] = [
   },
   {
     id: "ch06",
+    resetScope: "tools.bep",
     chapter: 6,
     partTitle: PART_2,
     title: "6장. 손익분기점 계산",
@@ -236,6 +261,7 @@ export const COURSE_STEPS: CourseStep[] = [
   },
   {
     id: "ch07",
+    resetScope: "tools.expenseReview",
     chapter: 7,
     partTitle: PART_2,
     title: "7장. 연애비, 취미비는 비용이 아니라 투자다",
@@ -264,6 +290,7 @@ export const COURSE_STEPS: CourseStep[] = [
   },
   {
     id: "ch08",
+    resetScope: "manual",
     chapter: 8,
     partTitle: PART_2,
     title: "8장. 나의 가치는 상각된다",
@@ -288,6 +315,7 @@ export const COURSE_STEPS: CourseStep[] = [
   },
   {
     id: "ch09",
+    resetScope: "balanceSheets",
     chapter: 9,
     partTitle: PART_3,
     title: "9장. 자산 목록",
@@ -318,6 +346,7 @@ export const COURSE_STEPS: CourseStep[] = [
   },
   {
     id: "ch10",
+    resetScope: "debts",
     chapter: 10,
     partTitle: PART_3,
     title: "10장. 부채 목록",
@@ -347,6 +376,7 @@ export const COURSE_STEPS: CourseStep[] = [
   },
   {
     id: "ch11",
+    resetScope: "annualTrackings",
     chapter: 11,
     partTitle: PART_3,
     title: "11장. 자기자본 증가 전략",
@@ -375,6 +405,7 @@ export const COURSE_STEPS: CourseStep[] = [
   },
   {
     id: "ch12",
+    resetScope: "cashFlows",
     chapter: 12,
     partTitle: PART_3,
     title: "12장. 현금흐름표",
@@ -402,6 +433,7 @@ export const COURSE_STEPS: CourseStep[] = [
   },
   {
     id: "ch13",
+    resetScope: "tools.insurance",
     chapter: 13,
     partTitle: PART_4,
     title: "13장. 적금은 자산이고, 보험은 뭘까",
@@ -430,6 +462,7 @@ export const COURSE_STEPS: CourseStep[] = [
   },
   {
     id: "ch14",
+    resetScope: "tools.investments",
     chapter: 14,
     partTitle: PART_4,
     title: "14장. 투자 입문 — 주식과 코인의 회계학",
@@ -461,6 +494,7 @@ export const COURSE_STEPS: CourseStep[] = [
   },
   {
     id: "ch15",
+    resetScope: "tools.taxRefund",
     chapter: 15,
     partTitle: PART_4,
     title: "15장. 연말정산은 회사의 결산",
@@ -489,6 +523,7 @@ export const COURSE_STEPS: CourseStep[] = [
   },
   {
     id: "ch16",
+    resetScope: "annualTrackings",
     chapter: 16,
     partTitle: PART_4,
     title: "16장. 내 삶의 감사의견",
@@ -520,6 +555,69 @@ export const COURSE_STEPS: CourseStep[] = [
       ),
   },
 ];
+
+export const RESET_SCOPE_LABEL: Record<CourseResetScope, string> = {
+  manual: "완료 표시",
+  incomeStatements: "손익계산서",
+  balanceSheets: "재무상태표",
+  cashFlows: "현금흐름표",
+  debts: "부채",
+  annualTrackings: "연간 기록",
+  "tools.payslip": "명세서 항목",
+  "tools.fixedCosts": "고정비 항목",
+  "tools.bep": "손익분기점 입력",
+  "tools.expenseReview": "지출 항목",
+  "tools.insurance": "보험 항목",
+  "tools.investments": "투자 항목",
+  "tools.taxRefund": "연말정산 입력",
+};
+
+/** 이 실습 범위에 지울 데이터가 몇 건 있는지 (0이면 다시 하기 버튼을 숨긴다) */
+export function stepDataCount(data: AppData, scope: CourseResetScope): number {
+  switch (scope) {
+    case "incomeStatements":
+      return data.incomeStatements.length;
+    case "balanceSheets":
+      return data.balanceSheets.length;
+    case "cashFlows":
+      return data.cashFlows.length;
+    case "debts":
+      return data.debts.length;
+    case "annualTrackings":
+      return data.annualTrackings.length;
+    case "tools.payslip":
+      return data.tools.payslip.filter((item) => item.amount > 0).length;
+    case "tools.fixedCosts":
+      return data.tools.fixedCosts.filter((item) => item.amount > 0).length;
+    case "tools.expenseReview":
+      return data.tools.expenseReview.filter((item) => item.amount > 0).length;
+    case "tools.insurance":
+      return data.tools.insurance.filter((item) => item.monthlyPremium > 0).length;
+    case "tools.investments":
+      return data.tools.investments.filter(
+        (item) => item.cost > 0 || item.marketValue > 0,
+      ).length;
+    case "tools.bep": {
+      const bep = data.tools.bep;
+      return bep.revenue > 0 || bep.fixedCost > 0 || bep.variableCost > 0 ? 1 : 0;
+    }
+    case "tools.taxRefund": {
+      const refund = data.tools.taxRefund;
+      return refund.expected > 0 || refund.lastYear > 0 ? 1 : 0;
+    }
+    case "manual":
+    default:
+      return 0;
+  }
+}
+
+/** 같은 데이터를 쓰는 다른 실습 (초기화하면 함께 미완료가 된다) */
+export function stepsSharingScope(step: CourseStep): CourseStep[] {
+  if (step.resetScope === "manual") return [];
+  return COURSE_STEPS.filter(
+    (other) => other.id !== step.id && other.resetScope === step.resetScope,
+  );
+}
 
 export const COURSE_TOTAL = COURSE_STEPS.length;
 

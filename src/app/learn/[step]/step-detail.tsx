@@ -9,17 +9,21 @@ import { Button } from "@/components/ui/Button";
 import { useAppStore } from "@/store/useAppStore";
 import {
   COURSE_STEPS,
+  RESET_SCOPE_LABEL,
   nextStepOf,
   practiceCtaLabel,
   resolveCompletion,
   stepById,
+  stepDataCount,
   stepIndex,
+  stepsSharingScope,
 } from "@/lib/course";
 
 export function StepDetail({ stepId }: { stepId: string }) {
   const data = useAppStore();
   const setStepComplete = useAppStore((state) => state.setStepComplete);
   const setCourseFocus = useAppStore((state) => state.setCourseFocus);
+  const clearStepData = useAppStore((state) => state.clearStepData);
   const step = stepById(stepId);
 
   if (!step) {
@@ -38,6 +42,27 @@ export function StepDetail({ stepId }: { stepId: string }) {
   const prev = index > 0 ? COURSE_STEPS[index - 1] : undefined;
   const next = nextStepOf(step);
   const { practice } = step;
+  const resolvedStepId = step.id;
+  const resetScope = step.resetScope;
+  const resetCount = stepDataCount(data, resetScope);
+  const sharers = stepsSharingScope(step);
+  const sharerLabel = sharers
+    .map((other) => (other.chapter ? `${other.chapter}장` : "프롤로그"))
+    .join("·");
+
+  function handleReset() {
+    const what =
+      resetScope === "manual"
+        ? "완료 표시를 해제할까요?"
+        : `${RESET_SCOPE_LABEL[resetScope]} ${resetCount}건을 삭제할까요?`;
+    const extra =
+      sharers.length > 0
+        ? `\n같은 데이터를 쓰는 ${sharerLabel}도 함께 미완료가 됩니다.`
+        : "";
+    if (window.confirm(`${what} 되돌릴 수 없습니다.${extra}`)) {
+      clearStepData(resolvedStepId, resetScope);
+    }
+  }
   const nextLabel = next ? (next.chapter ? `${next.chapter}장` : "프롤로그") : "";
 
   return (
@@ -176,6 +201,25 @@ export function StepDetail({ stepId }: { stepId: string }) {
             </>
           )}
         </Card>
+
+        {resetCount > 0 || manual ? (
+          <Card>
+            <CardTitle hint="데이터 지우기">다시 실습하기</CardTitle>
+            <p className="text-sm text-muted">
+              {resetScope === "manual"
+                ? "완료 표시만 해제합니다."
+                : `${RESET_SCOPE_LABEL[resetScope]} ${resetCount}건이 삭제되고 이 실습은 미완료로 돌아갑니다.`}
+              {sharers.length > 0
+                ? ` 같은 데이터를 쓰는 ${sharerLabel}도 함께 미완료가 됩니다.`
+                : null}
+            </p>
+            <div className="mt-3">
+              <Button size="sm" variant="danger" onClick={handleReset}>
+                데이터 지우고 다시 하기
+              </Button>
+            </div>
+          </Card>
+        ) : null}
 
         <div className="flex items-center justify-between gap-2 pb-2">
           {prev ? (

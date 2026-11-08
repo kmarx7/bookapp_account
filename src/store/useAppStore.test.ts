@@ -99,3 +99,51 @@ describe("useAppStore", () => {
     expect(state.user?.nickname).toBe("이모 대표");
   });
 });
+
+describe("clearStepData", () => {
+  it("clears only the income statements and unmarks the step", () => {
+    useAppStore.getState().setUser(user);
+    useAppStore.getState().upsertIncomeStatement(createIncomeStatement("u1", 2026, 11));
+    useAppStore.getState().addDebt({
+      id: "d1",
+      userId: "u1",
+      name: "카드",
+      balance: 100,
+      annualRate: 0,
+      monthlyPayment: 0,
+      updatedAt: "2026-01-01T00:00:00.000Z",
+    });
+    useAppStore.getState().setStepComplete("ch02", true);
+
+    useAppStore.getState().clearStepData("ch02", "incomeStatements");
+
+    const state = useAppStore.getState();
+    expect(state.incomeStatements).toHaveLength(0);
+    expect(state.debts).toHaveLength(1);
+    expect(state.user?.nickname).toBe("이모 대표");
+    expect(state.courseProgress.completedSteps).not.toContain("ch02");
+  });
+
+  it("clears only the targeted tool", () => {
+    useAppStore.getState().updateTool("fixedCosts", [
+      { id: "f", name: "구독", amount: 12_000, period: "monthly" },
+    ]);
+    useAppStore.getState().updateTool("payslip", [
+      { id: "p", name: "기본급", amount: 3_000_000, kind: "income" },
+    ]);
+
+    useAppStore.getState().clearStepData("ch05", "tools.fixedCosts");
+
+    const state = useAppStore.getState();
+    expect(state.tools.fixedCosts.every((item) => item.amount === 0)).toBe(true);
+    expect(state.tools.payslip.some((item) => item.amount > 0)).toBe(true);
+  });
+
+  it("only unmarks the manual step", () => {
+    useAppStore.getState().setStepComplete("ch08", true);
+    useAppStore.getState().clearStepData("ch08", "manual");
+    expect(useAppStore.getState().courseProgress.completedSteps).not.toContain(
+      "ch08",
+    );
+  });
+});

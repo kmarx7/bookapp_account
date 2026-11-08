@@ -7,7 +7,9 @@ import {
   practiceCtaLabel,
   resolveCompletion,
   stepById,
+  stepDataCount,
   stepIndex,
+  stepsSharingScope,
 } from "@/lib/course";
 import { DEFAULT_APP_DATA } from "@/lib/storage/schema";
 import type { AppData } from "@/types";
@@ -167,5 +169,45 @@ describe("practice clarity (Phase: 실습 진입 명확화)", () => {
   it("resolves the next step so the practice screen can guide the return", () => {
     expect(nextStepOf(stepById("ch01")!)?.id).toBe("ch02");
     expect(nextStepOf(stepById("ch16")!)).toBeUndefined();
+  });
+});
+
+describe("practice reset scopes", () => {
+  it("maps every step to the data it can reset", () => {
+    for (const step of COURSE_STEPS) {
+      if (step.isComplete) {
+        expect(step.resetScope, step.id).not.toBe("manual");
+      } else {
+        expect(step.resetScope, step.id).toBe("manual");
+      }
+    }
+  });
+
+  it("counts the data behind each scope", () => {
+    const base = data();
+    expect(stepDataCount(base, "incomeStatements")).toBe(0);
+    expect(
+      stepDataCount(data({ incomeStatements: [{} as never] }), "incomeStatements"),
+    ).toBe(1);
+    expect(
+      stepDataCount(data({ debts: [{} as never, {} as never] }), "debts"),
+    ).toBe(2);
+
+    const tools = {
+      ...base.tools,
+      fixedCosts: [
+        { id: "f", name: "구독", amount: 12_000, period: "monthly" as const },
+      ],
+    };
+    expect(stepDataCount(data({ tools }), "tools.fixedCosts")).toBe(1);
+    expect(stepDataCount(data({ tools }), "tools.expenseReview")).toBe(0);
+  });
+
+  it("lists the other steps that share the same data", () => {
+    expect(stepsSharingScope(stepById("ch01")!).map((step) => step.id)).toEqual([
+      "ch03",
+      "ch09",
+    ]);
+    expect(stepsSharingScope(stepById("ch08")!)).toEqual([]);
   });
 });

@@ -9,8 +9,9 @@ import type {
   ToolData,
   User,
 } from "@/types";
-import { createDefaultAppData } from "@/lib/storage/schema";
+import { createDefaultAppData, createDefaultTools } from "@/lib/storage/schema";
 import { storeCourseFocus } from "@/lib/course/focus";
+import type { CourseResetScope } from "@/lib/course";
 
 export interface AppState extends AppData {
   hydrated: boolean;
@@ -41,6 +42,11 @@ export interface AppState extends AppData {
    */
   courseFocus: string | null;
   setCourseFocus: (stepId: string | null) => void;
+  /**
+   * 한 실습 단계의 데이터만 초기화한다(대표 정보·다른 단계 데이터는 유지).
+   * 수동 완료 표시도 함께 해제해 그 단계가 "미완료"로 돌아간다.
+   */
+  clearStepData: (stepId: string, scope: CourseResetScope) => void;
 }
 
 const now = () => new Date().toISOString();
@@ -152,6 +158,50 @@ export const useAppStore = create<AppState>((set, get) => ({
   setCourseFocus: (stepId) => {
     storeCourseFocus(stepId);
     set({ courseFocus: stepId });
+  },
+
+  clearStepData: (stepId, scope) => {
+    const courseProgress = {
+      completedSteps: get().courseProgress.completedSteps.filter(
+        (id) => id !== stepId,
+      ),
+      updatedAt: now(),
+    };
+
+    if (scope === "manual") {
+      set({ courseProgress });
+      return;
+    }
+
+    if (scope.startsWith("tools.")) {
+      const key = scope.slice("tools.".length) as keyof ToolData;
+      const defaults = createDefaultTools();
+      set({
+        courseProgress,
+        tools: { ...get().tools, [key]: defaults[key], updatedAt: now() },
+      });
+      return;
+    }
+
+    switch (scope) {
+      case "incomeStatements":
+        set({ courseProgress, incomeStatements: [] });
+        return;
+      case "balanceSheets":
+        set({ courseProgress, balanceSheets: [] });
+        return;
+      case "cashFlows":
+        set({ courseProgress, cashFlows: [] });
+        return;
+      case "debts":
+        set({ courseProgress, debts: [] });
+        return;
+      case "annualTrackings":
+        set({ courseProgress, annualTrackings: [] });
+        return;
+      default:
+        set({ courseProgress });
+    }
   },
 }));
 
