@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
+import { Download } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, CardTitle } from "@/components/ui/Card";
 import { StatBlock } from "@/components/ui/StatBlock";
@@ -16,6 +18,7 @@ import { ViewTabs, type SheetView } from "@/components/statement/ViewTabs";
 import { SignatureCanvas } from "@/components/signature/SignatureCanvas";
 import { useAppStore } from "@/store/useAppStore";
 import {
+  annualRowsFromBalanceSheets,
   calcAnnualGrowth,
   createAnnualTracking,
 } from "@/lib/calculations/annual";
@@ -29,10 +32,12 @@ export default function AnnualPage() {
   const userName = useAppStore((state) => state.user?.nickname);
   const userId = useAppStore((state) => state.user?.id ?? "local");
   const trackings = useAppStore((state) => state.annualTrackings);
+  const balanceSheets = useAppStore((state) => state.balanceSheets);
   const upsertAnnual = useAppStore((state) => state.upsertAnnual);
   const now = useMemo(() => new Date(), []);
   const [signYear, setSignYear] = useState(now.getFullYear());
   const [view, setView] = useState<SheetView>("input");
+  const [message, setMessage] = useState("");
 
   const years = useMemo(
     () =>
@@ -51,6 +56,36 @@ export default function AnnualPage() {
     upsertAnnual({ ...rowFor(year), ...patch, userId, year });
   }
 
+  function importFromSheets() {
+    const rows = annualRowsFromBalanceSheets(balanceSheets);
+    if (rows.length === 0) {
+      setMessage("불러올 재무상태표가 없습니다. 먼저 재무상태표를 작성해 주세요.");
+      return;
+    }
+
+    const inRange = rows.filter((row) => years.includes(row.year));
+    const skipped = rows.length - inRange.length;
+
+    if (inRange.length === 0) {
+      setMessage(
+        `${years[0]}~${years[years.length - 1]}년에 해당하는 재무상태표가 없습니다.`,
+      );
+      return;
+    }
+
+    for (const row of inRange) {
+      updateRow(row.year, {
+        totalAssets: row.totalAssets,
+        totalDebts: row.totalDebts,
+      });
+    }
+
+    setMessage(
+      `${inRange.map((row) => `${row.year}년`).join("·")} 재무상태표에서 자산·부채를 불러왔습니다.` +
+        (skipped > 0 ? ` (표에 없는 연도 ${skipped}건은 건너뜀)` : ""),
+    );
+  }
+
   const computed = calcAnnualGrowth(
     years
       .map(rowFor)
@@ -64,7 +99,7 @@ export default function AnnualPage() {
     <>
       <PageHeader
         title="연간 자기자본 추적"
-        description="연도별 자산/부채를 기록하면 자기자본 증가율이 계산됩니다."
+        description="연도별 자산/부채를 기록하거나 재무상태표에서 불러오면 자기자본 증가율이 계산됩니다."
       />
 
       <ViewTabs view={view} onChange={setView} />
@@ -72,7 +107,22 @@ export default function AnnualPage() {
       {view === "input" ? (
         <div className="flex flex-col gap-4">
           <Card>
-            <CardTitle hint="1~5년차">연도별 입력</CardTitle>
+            <CardTitle
+              hint={
+                <span className="flex items-center gap-3">
+                  <span>1~5년차</span>
+                  <button
+                    type="button"
+                    onClick={importFromSheets}
+                    className="inline-flex items-center gap-1 text-brand"
+                  >
+                    <Download size={14} /> 자료 불러오기
+                  </button>
+                </span>
+              }
+            >
+              연도별 입력
+            </CardTitle>
             <div className="overflow-x-auto">
               <table className="w-full min-w-[560px] text-sm">
                 <thead>
@@ -114,6 +164,18 @@ export default function AnnualPage() {
                 </tbody>
               </table>
             </div>
+
+            {message ? (
+              <p className="mt-3 text-xs text-muted">{message}</p>
+            ) : null}
+            {balanceSheets.length === 0 ? (
+              <p className="mt-2 text-xs text-muted">
+                <Link href="/balance-sheet" className="text-brand hover:underline">
+                  재무상태표 작성하러 가기
+                </Link>{" "}
+                — 작성해 두면 연도별 자산·부채를 한 번에 불러올 수 있습니다.
+              </p>
+            ) : null}
           </Card>
 
           {latest ? (
