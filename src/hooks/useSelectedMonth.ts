@@ -8,6 +8,8 @@ export interface SelectedMonth {
   label: string;
   prev: () => void;
   next: () => void;
+  /** 특정 연·월로 바로 이동 (달력에서 월을 고를 때) */
+  goTo: (year: number, month: number) => void;
 }
 
 export function useSelectedMonth(initial?: { year: number; month: number }): SelectedMonth {
@@ -35,5 +37,10 @@ export function useSelectedMonth(initial?: { year: number; month: number }): Sel
     });
   }, []);
 
-  return { year, month, label: `${year}년 ${month}월`, prev, next };
+  const goTo = useCallback((nextYear: number, nextMonth: number) => {
+    setYear(nextYear);
+    setMonth(nextMonth);
+  }, []);
+
+  return { year, month, label: `${year}년 ${month}월`, prev, next, goTo };
 }
