@@ -10,6 +10,7 @@ import type {
   User,
 } from "@/types";
 import { createDefaultAppData } from "@/lib/storage/schema";
+import { storeCourseFocus } from "@/lib/course/focus";
 
 export interface AppState extends AppData {
   hydrated: boolean;
@@ -148,7 +149,10 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   courseFocus: null,
 
-  setCourseFocus: (stepId) => set({ courseFocus: stepId }),
+  setCourseFocus: (stepId) => {
+    storeCourseFocus(stepId);
+    set({ courseFocus: stepId });
+  },
 }));
 
 export function selectIncomeStatement(
