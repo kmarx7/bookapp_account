@@ -77,63 +77,10 @@ export function StepDetail({ stepId }: { stepId: string }) {
       />
 
       <div className="flex flex-col gap-4">
-        {/* 1) 이번 장에서 할 일 — 진입점을 가장 위에, 버튼은 '행동'을 말한다 */}
+        {/* 1) 이번 장에서 할 일 — 실습 이름과 목표만 먼저 보여준다 */}
         <Card>
           <CardTitle hint={practice.duration}>{practice.title}</CardTitle>
           <p className="text-sm text-brand-dark">{practice.goal}</p>
-
-          <p className="mt-3 rounded-xl bg-surface-muted px-4 py-3 text-xs text-muted">
-            완료 조건 · {done && auto ? "충족했습니다" : practice.completionHint}
-          </p>
-
-          <div className="mt-4 flex flex-wrap items-center gap-2">
-            {done && next ? (
-              <Link
-                href={`/learn/${next.id}`}
-                className="inline-flex h-11 items-center gap-2 rounded-xl bg-brand px-4 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
-              >
-                다음 {nextLabel} 실습하기
-                <ArrowRight size={16} />
-              </Link>
-            ) : null}
-
-            {practice.target ? (
-              <Link
-                href={practice.target}
-                onClick={() => setCourseFocus(step.id)}
-                className={
-                  done && next
-                    ? "inline-flex h-11 items-center gap-2 rounded-xl bg-surface px-4 text-sm font-medium text-brand transition-colors hover:bg-border"
-                    : "inline-flex h-11 items-center gap-2 rounded-xl bg-brand px-4 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
-                }
-              >
-                {done ? `${practiceCtaLabel(step)} 다시 열기` : practiceCtaLabel(step)}
-                {practice.targetLabel ? (
-                  <span className="text-xs font-normal opacity-80">
-                    · {practice.targetLabel}
-                  </span>
-                ) : null}
-                <ArrowRight size={16} />
-              </Link>
-            ) : (
-              <p className="rounded-xl bg-surface-muted px-4 py-3 text-sm text-muted">
-                이 실습은 앱 입력 없이 종이·메모로 진행합니다.
-              </p>
-            )}
-          </div>
-
-          {practice.startHint ? (
-            <p className="mt-3 rounded-xl bg-brand-soft px-4 py-2 text-xs font-medium text-brand">
-              먼저 · {practice.startHint}
-            </p>
-          ) : null}
-
-          {practice.target ? (
-            <p className="mt-3 text-xs text-muted">
-              입력하러 갔다가 이 화면으로 돌아오면 자동으로 완료 표시됩니다. 다른 화면 위에
-              실습 안내 바가 떠 있으니 그대로 따라 하시면 됩니다.
-            </p>
-          ) : null}
         </Card>
 
         {/* 2) 할 일 체크리스트 — 각 항목을 앱의 어느 칸에서 하는지 함께 표시 */}
@@ -170,6 +117,63 @@ export function StepDetail({ stepId }: { stepId: string }) {
           <p className="mt-4 rounded-xl bg-surface-muted px-4 py-3 text-sm text-muted">
             {step.summary}
           </p>
+        </Card>
+
+        {/* 4) 실습 시작 — 할 일·개념을 다 읽은 뒤 누르는 버튼 */}
+        <Card>
+          <CardTitle hint="여기서 시작">실습 시작</CardTitle>
+          <p className="rounded-xl bg-surface-muted px-4 py-3 text-xs text-muted">
+            완료 조건 · {done && auto ? "충족했습니다" : practice.completionHint}
+          </p>
+
+          {practice.startHint ? (
+            <p className="mt-2 rounded-xl bg-brand-soft px-4 py-2 text-xs font-medium text-brand">
+              먼저 · {practice.startHint}
+            </p>
+          ) : null}
+
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            {done && next ? (
+              <Link
+                href={`/learn/${next.id}`}
+                className="inline-flex h-11 items-center gap-2 rounded-xl bg-brand px-4 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
+              >
+                다음 {nextLabel} 실습하기
+                <ArrowRight size={16} />
+              </Link>
+            ) : null}
+
+            {practice.target ? (
+              <Link
+                href={practice.target}
+                onClick={() => setCourseFocus(resolvedStepId)}
+                className={
+                  done && next
+                    ? "inline-flex h-11 items-center gap-2 rounded-xl bg-surface px-4 text-sm font-medium text-brand transition-colors hover:bg-border"
+                    : "inline-flex h-11 items-center gap-2 rounded-xl bg-brand px-4 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
+                }
+              >
+                {done ? `${practiceCtaLabel(step)} 다시 열기` : practiceCtaLabel(step)}
+                {practice.targetLabel ? (
+                  <span className="text-xs font-normal opacity-80">
+                    · {practice.targetLabel}
+                  </span>
+                ) : null}
+                <ArrowRight size={16} />
+              </Link>
+            ) : (
+              <p className="rounded-xl bg-surface-muted px-4 py-3 text-sm text-muted">
+                이 실습은 앱 입력 없이 종이·메모로 진행합니다.
+              </p>
+            )}
+          </div>
+
+          {practice.target ? (
+            <p className="mt-3 text-xs text-muted">
+              입력하러 갔다가 이 화면으로 돌아오면 자동으로 완료 표시됩니다. 화면 아래
+              안내 바에서 완료 여부와 코스 복귀를 바로 확인할 수 있습니다.
+            </p>
+          ) : null}
         </Card>
 
         {/* 4) 완료 처리 — 자동 확인 스텝은 '무엇을 채우면 되는지'를 그대로 보여준다 */}
