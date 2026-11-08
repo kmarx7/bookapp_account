@@ -13,7 +13,6 @@ import { Gauge } from "@/components/ui/Gauge";
 import { InstallPrompt } from "@/components/pwa/InstallPrompt";
 import { courseStats } from "@/lib/course";
 import { LazyMonthlyTrendChart as MonthlyTrendChart } from "@/components/charts/lazy";
-import { YearDiary } from "@/components/home/YearDiary";
 import { useSelectedMonth } from "@/hooks/useSelectedMonth";
 import { useAppStore } from "@/store/useAppStore";
 import { calcBalanceSheet } from "@/lib/calculations/balanceSheet";
@@ -22,7 +21,7 @@ import { AUDIT_OPINION_LABELS } from "@/lib/constants";
 import { formatKRW, formatPercent, formatDate } from "@/lib/format";
 
 export default function HomePage() {
-  const { year, month, label, prev, next, goTo } = useSelectedMonth();
+  const { year, month, label, prev, next } = useSelectedMonth();
   const user = useAppStore((state) => state.user);
   const income = useAppStore((state) =>
     state.incomeStatements.find((item) => item.year === year && item.month === month),
@@ -72,14 +71,6 @@ export default function HomePage() {
         title={`${user?.nickname ?? "대표"}님의 결산`}
         description={user ? `설립일 ${formatDate(user.foundedAt)}` : undefined}
       />
-
-      <div className="mb-4">
-        <YearDiary
-          year={year}
-          selectedMonth={month}
-          onSelect={(nextMonth) => goTo(year, nextMonth)}
-        />
-      </div>
 
       <div className="mb-4">
         <MonthSwitcher label={label} onPrev={prev} onNext={next} />

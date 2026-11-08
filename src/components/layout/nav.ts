@@ -1,5 +1,6 @@
 import {
   BookOpen,
+  CalendarDays,
   Home,
   LineChart,
   MoreHorizontal,
@@ -27,6 +28,7 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/cash-flow", label: "월간 현금흐름표", shortLabel: "현금흐름", icon: Waves },
   { href: "/debts", label: "부채관리", shortLabel: "부채", icon: Wallet },
   { href: "/annual", label: "연간 자기자본 추적", shortLabel: "연간추적", icon: TrendingUp },
+  { href: "/calendar", label: "회계 달력", shortLabel: "달력", icon: CalendarDays },
   { href: "/tools", label: "도구함", shortLabel: "도구함", icon: Wrench },
   { href: "/settings", label: "설정", shortLabel: "설정", icon: Settings },
 ];

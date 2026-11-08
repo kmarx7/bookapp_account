@@ -10,7 +10,7 @@ export default function MorePage() {
 
   return (
     <>
-      <PageHeader title="더보기" description="부채·연간 추적·도구함·설정" />
+      <PageHeader title="더보기" description="달력·부채·연간 추적·도구함·설정" />
       <div className="flex flex-col gap-2">
         {items.map((item) => {
           const Icon = item.icon;
