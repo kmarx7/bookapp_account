@@ -103,23 +103,7 @@ export function StepDetail({ stepId }: { stepId: string }) {
           </ol>
         </Card>
 
-        {/* 3) 핵심 개념 */}
-        <Card>
-          <CardTitle>핵심 개념</CardTitle>
-          <ul className="flex flex-col gap-2">
-            {step.concepts.map((concept) => (
-              <li key={concept} className="flex gap-2 text-sm text-brand-dark">
-                <Circle size={7} className="mt-1.5 shrink-0 fill-brand text-brand" />
-                <span>{concept}</span>
-              </li>
-            ))}
-          </ul>
-          <p className="mt-4 rounded-xl bg-surface-muted px-4 py-3 text-sm text-muted">
-            {step.summary}
-          </p>
-        </Card>
-
-        {/* 4) 실습 시작 — 할 일·개념을 다 읽은 뒤 누르는 버튼 */}
+        {/* 3) 실습 시작 — 할 일을 확인한 뒤 바로 누르는 버튼 */}
         <Card>
           <CardTitle hint="여기서 시작">실습 시작</CardTitle>
           <p className="rounded-xl bg-surface-muted px-4 py-3 text-xs text-muted">
@@ -176,7 +160,23 @@ export function StepDetail({ stepId }: { stepId: string }) {
           ) : null}
         </Card>
 
-        {/* 4) 완료 처리 — 자동 확인 스텝은 '무엇을 채우면 되는지'를 그대로 보여준다 */}
+        {/* 4) 핵심 개념 */}
+        <Card>
+          <CardTitle>핵심 개념</CardTitle>
+          <ul className="flex flex-col gap-2">
+            {step.concepts.map((concept) => (
+              <li key={concept} className="flex gap-2 text-sm text-brand-dark">
+                <Circle size={7} className="mt-1.5 shrink-0 fill-brand text-brand" />
+                <span>{concept}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-4 rounded-xl bg-surface-muted px-4 py-3 text-sm text-muted">
+            {step.summary}
+          </p>
+        </Card>
+
+        {/* 5) 완료 처리 — 자동 확인 스텝은 '무엇을 채우면 되는지'를 그대로 보여준다 */}
         <Card>
           <CardTitle>완료 처리</CardTitle>
           {auto ? (
