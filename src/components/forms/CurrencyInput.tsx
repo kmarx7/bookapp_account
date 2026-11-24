@@ -23,7 +23,7 @@ export function CurrencyInput({
         id={id}
         inputMode="numeric"
         disabled={disabled}
-        className="num h-11 w-full rounded-xl border border-border bg-surface px-3 pr-8 text-right text-sm text-brand-dark outline-none transition-colors focus:border-brand disabled:opacity-60"
+        className="num h-11 w-full rounded-xl border border-border bg-surface px-3 pr-8 text-right text-sm text-brand-dark outline-none transition-colors focus:border-brand focus:ring-2 focus:ring-brand/40 disabled:opacity-60"
         value={value ? formatNumber(value) : ""}
         placeholder={placeholder}
         onChange={(event) => onChange(parseAmount(event.target.value))}

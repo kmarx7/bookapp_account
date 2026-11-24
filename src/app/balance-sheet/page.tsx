@@ -12,12 +12,15 @@ import { FieldGroup, FieldRow } from "@/components/forms/FieldRow";
 import { CurrencyInput } from "@/components/forms/CurrencyInput";
 import { Sheet, SheetGroup, SheetRow } from "@/components/statement/Sheet";
 import { ViewTabs, type SheetView } from "@/components/statement/ViewTabs";
+import { SummaryBar } from "@/components/statement/SummaryBar";
+import { SampleDataCard } from "@/components/statement/SampleDataCard";
 import { CompositionDonut } from "@/components/charts/CompositionDonut";
 import { useAppStore } from "@/store/useAppStore";
 import {
   calcBalanceSheet,
   createBalanceSheet,
 } from "@/lib/calculations/balanceSheet";
+import { sumValues } from "@/lib/calculations/incomeStatement";
 import {
   CURRENT_ASSET_LABELS,
   DEBT_LABELS,
@@ -69,9 +72,32 @@ export default function BalanceSheetPage() {
 
   const computed = calcBalanceSheet(current);
 
+  const hasData =
+    sumValues(current.currentAssets) !== 0 ||
+    sumValues(current.fixedAssets) !== 0 ||
+    sumValues(current.debts) !== 0;
+
   function update(patch: Partial<BalanceSheetType>) {
     if (!current) return;
     upsert({ ...current, ...patch, userId, updatedAt: new Date().toISOString() });
+  }
+
+  function applySample() {
+    update({
+      currentAssets: {
+        cash: 2_100_000,
+        savings: 8_500_000,
+        stocks: 3_200_000,
+        others: 500_000,
+      },
+      fixedAssets: { deposit: 10_000_000, pension: 6_400_000, others: 800_000 },
+      debts: {
+        studentLoan: 0,
+        cardBalance: 450_000,
+        overdraft: 0,
+        otherLoans: 12_000_000,
+      },
+    });
   }
 
   return (
@@ -120,6 +146,24 @@ export default function BalanceSheetPage() {
 
       {view === "input" ? (
         <>
+        <SummaryBar
+          className="mb-3 lg:hidden"
+          items={[
+            { label: "자산", value: formatKRW(computed.totalAssets) },
+            { label: "부채", value: formatKRW(computed.totalDebts) },
+            {
+              label: `자기자본 (${formatPercent(computed.equityRatio)})`,
+              value: formatKRW(computed.equity),
+              tone: computed.equity < 0 ? "neg" : "pos",
+            },
+          ]}
+          operators={["−"]}
+        />
+        {!hasData ? (
+          <div className="mb-3">
+            <SampleDataCard onApply={applySample} />
+          </div>
+        ) : null}
         <div className="grid gap-4 lg:grid-cols-2">
           <Card>
             <CardTitle hint="입력">자산 / 부채</CardTitle>
@@ -191,15 +235,16 @@ export default function BalanceSheetPage() {
             <CardTitle>자동 계산 결과</CardTitle>
             <div className="flex flex-col gap-3">
               <div className="grid grid-cols-2 gap-3">
-                <StatBlock label="유동자산" value={formatKRW(computed.totalCurrentAssets)} />
-                <StatBlock label="고정자산" value={formatKRW(computed.totalFixedAssets)} />
+                <StatBlock label="유동자산" value={formatKRW(computed.totalCurrentAssets)} placeholder={!hasData} />
+                <StatBlock label="고정자산" value={formatKRW(computed.totalFixedAssets)} placeholder={!hasData} />
               </div>
-              <StatBlock label="자산 총계" value={formatKRW(computed.totalAssets)} />
-              <StatBlock label="부채 총계" value={formatKRW(computed.totalDebts)} tone="negative" />
+              <StatBlock label="자산 총계" value={formatKRW(computed.totalAssets)} placeholder={!hasData} />
+              <StatBlock label="부채 총계" value={formatKRW(computed.totalDebts)} tone="negative" placeholder={!hasData} />
               <StatBlock
                 label="자기자본"
                 value={formatKRW(computed.equity)}
                 tone={toneForValue(computed.equity)}
+                placeholder={!hasData}
               />
               <div className="pt-2">
                 <Gauge ratio={computed.equityRatio} label="자기자본 비율" />
@@ -213,7 +258,7 @@ export default function BalanceSheetPage() {
             title="자산 구성"
             total={computed.totalAssets}
             data={[
-              { name: "유동자산", value: computed.totalCurrentAssets, color: "#1b2a4a" },
+              { name: "유동자산", value: computed.totalCurrentAssets, color: "#3730a3" },
               { name: "고정자산", value: computed.totalFixedAssets, color: "#4b6a9b" },
             ]}
           />

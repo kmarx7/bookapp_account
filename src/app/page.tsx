@@ -79,7 +79,7 @@ export default function HomePage() {
         <MonthSwitcher label={label} onPrev={prev} onNext={next} />
       </div>
 
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 pb-16 md:pb-6">
         <Card>
           <CardTitle hint={`${learn.done} / ${learn.total} 완료`}>학습 코스</CardTitle>
           <Gauge ratio={learn.ratio} label="코스 진행" />
@@ -151,6 +151,10 @@ export default function HomePage() {
                 />
               </div>
               <Gauge ratio={balanceComputed.equityRatio} label="자기자본 비율" />
+              <p className="text-xs text-muted">
+                현재 자기자본 비율은{" "}
+                {formatPercent(balanceComputed.equityRatio)}입니다.
+              </p>
             </div>
           ) : (
             <EmptyState
@@ -202,15 +206,6 @@ export default function HomePage() {
           ) : (
             <p className="text-sm text-muted">아직 기록이 없습니다.</p>
           )}
-        </Card>
-
-        <Card>
-          <CardTitle>자기자본 비율 게이지</CardTitle>
-          <p className="text-sm text-muted">
-            {balanceComputed
-              ? `현재 자기자본 비율은 ${formatPercent(balanceComputed.equityRatio)}입니다.`
-              : "재무상태표를 작성하면 비율이 표시됩니다."}
-          </p>
         </Card>
 
         <InstallPrompt />

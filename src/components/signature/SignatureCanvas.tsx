@@ -18,7 +18,7 @@ export function SignatureCanvas({
     if (!context) return;
     context.lineWidth = 2.5;
     context.lineCap = "round";
-    context.strokeStyle = "#1b2a4a";
+    context.strokeStyle = "#3730a3";
   }, []);
 
   function getPoint(event: React.PointerEvent<HTMLCanvasElement>) {

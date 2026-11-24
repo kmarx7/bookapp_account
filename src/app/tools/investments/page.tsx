@@ -65,7 +65,7 @@ export default function InvestmentsPage() {
                       value={item.name}
                       placeholder="종목 이름"
                       onChange={(event) => updateItem(item.id, { name: event.target.value })}
-                      className="h-10 flex-1 rounded-xl border border-border px-3 text-sm outline-none transition-colors focus:border-brand"
+                      className="h-10 flex-1 rounded-xl border border-border px-3 text-sm outline-none transition-colors focus:border-brand focus:ring-2 focus:ring-brand/40"
                     />
                     <span className="num w-24 text-right text-xs text-muted">
                       {item.cost ? formatSignedPercent(gain / item.cost) : "-"}

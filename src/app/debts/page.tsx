@@ -144,7 +144,7 @@ export default function DebtsPage() {
                           onChange={(event) =>
                             updateDebt(debt.id, { name: event.target.value })
                           }
-                          className="rounded-lg border border-transparent px-2 py-1 text-sm font-semibold text-brand outline-none transition-colors hover:border-border focus:border-brand"
+                          className="rounded-lg border border-transparent px-2 py-1 text-sm font-semibold text-brand outline-none transition-colors hover:border-border focus:border-brand focus:ring-2 focus:ring-brand/40"
                         />
                       </div>
                       <button
@@ -211,7 +211,7 @@ export default function DebtsPage() {
                       onChange={(event) =>
                         updateDebt(debt.id, { strategy: event.target.value })
                       }
-                      className="mt-3 w-full rounded-lg border border-border px-3 py-2 text-sm outline-none transition-colors focus:border-brand"
+                      className="mt-3 w-full rounded-lg border border-border px-3 py-2 text-sm outline-none transition-colors focus:border-brand focus:ring-2 focus:ring-brand/40"
                     />
                   </Card>
                 );

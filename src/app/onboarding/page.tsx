@@ -46,7 +46,7 @@ export default function OnboardingPage() {
             value={nickname}
             onChange={(event) => setNickname(event.target.value)}
             placeholder="예: 이모 대표"
-            className="h-11 rounded-xl border border-border px-3 text-sm outline-none transition-colors focus:border-brand"
+            className="h-11 rounded-xl border border-border px-3 text-sm outline-none transition-colors focus:border-brand focus:ring-2 focus:ring-brand/40"
           />
         </label>
         <label className="flex flex-col gap-2">
@@ -55,7 +55,7 @@ export default function OnboardingPage() {
             type="date"
             value={foundedAt}
             onChange={(event) => setFoundedAt(event.target.value)}
-            className="num h-11 rounded-xl border border-border px-3 text-sm outline-none transition-colors focus:border-brand"
+            className="num h-11 rounded-xl border border-border px-3 text-sm outline-none transition-colors focus:border-brand focus:ring-2 focus:ring-brand/40"
           />
         </label>
       </div>

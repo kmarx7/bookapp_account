@@ -49,7 +49,7 @@ export function EquityLineChart({ data }: { data: AnnualComputed[] }) {
             type="monotone"
             dataKey="equity"
             name="자기자본"
-            stroke="#1b2a4a"
+            stroke="#3730a3"
             strokeWidth={2}
             dot={{ r: 3 }}
             isAnimationActive={!reduced}
@@ -86,7 +86,7 @@ export function AssetDebtBarChart({ data }: { data: AnnualComputed[] }) {
           <Bar
             dataKey="totalAssets"
             name="자산"
-            fill="#1b2a4a"
+            fill="#3730a3"
             radius={[4, 4, 0, 0]}
             isAnimationActive={!reduced}
           />

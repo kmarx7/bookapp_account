@@ -20,7 +20,7 @@ export function PercentInput({
         inputMode="decimal"
         step={step}
         min={0}
-        className="num h-11 w-full rounded-xl border border-border bg-surface px-3 pr-8 text-right text-sm text-brand-dark outline-none transition-colors focus:border-brand"
+        className="num h-11 w-full rounded-xl border border-border bg-surface px-3 pr-8 text-right text-sm text-brand-dark outline-none transition-colors focus:border-brand focus:ring-2 focus:ring-brand/40"
         value={Number.isFinite(value) ? value : ""}
         placeholder={placeholder}
         onChange={(event) => onChange(Number.parseFloat(event.target.value) || 0)}

@@ -149,7 +149,7 @@ export default function ExpenseReviewPage() {
                   value={item.name}
                   placeholder="예: 적금 납입, 통신비"
                   onChange={(event) => updateDraft(item.id, { name: event.target.value })}
-                  className="h-11 flex-1 rounded-xl border border-border px-3 text-sm outline-none transition-colors focus:border-brand"
+                  className="h-11 flex-1 rounded-xl border border-border px-3 text-sm outline-none transition-colors focus:border-brand focus:ring-2 focus:ring-brand/40"
                 />
                 <select
                   value={item.category}
@@ -159,7 +159,7 @@ export default function ExpenseReviewPage() {
                       category: event.target.value as ExpenseCategory,
                     })
                   }
-                  className="h-11 rounded-xl border border-border bg-surface px-2 text-xs outline-none transition-colors focus:border-brand"
+                  className="h-11 rounded-xl border border-border bg-surface px-2 text-xs outline-none transition-colors focus:border-brand focus:ring-2 focus:ring-brand/40"
                 >
                   {EXPENSE_CATEGORIES.map((category) => (
                     <option key={category} value={category}>

@@ -9,6 +9,8 @@ import { FieldGroup, FieldRow } from "@/components/forms/FieldRow";
 import { CurrencyInput } from "@/components/forms/CurrencyInput";
 import { Sheet, SheetGroup, SheetRow } from "@/components/statement/Sheet";
 import { ViewTabs, type SheetView } from "@/components/statement/ViewTabs";
+import { SummaryBar } from "@/components/statement/SummaryBar";
+import { SampleDataCard } from "@/components/statement/SampleDataCard";
 import { CompositionDonut } from "@/components/charts/CompositionDonut";
 import { useSelectedMonth } from "@/hooks/useSelectedMonth";
 import { useAppStore } from "@/store/useAppStore";
@@ -41,8 +43,44 @@ export default function IncomePage() {
   const current = record ?? createIncomeStatement(userId, year, month);
   const computed = calcIncomeStatement(current);
 
+  const hasData =
+    current.salaryNet !== 0 ||
+    current.otherIncome !== 0 ||
+    sumValues(current.fixedCosts) !== 0 ||
+    sumValues(current.variableCosts) !== 0 ||
+    sumValues(current.investmentCosts) !== 0 ||
+    sumValues(current.capitalAllocation) !== 0;
+
   function update(patch: Partial<IncomeStatement>) {
     upsert({ ...current, ...patch, userId, updatedAt: new Date().toISOString() });
+  }
+
+  function applySample() {
+    update({
+      salaryNet: 3_200_000,
+      otherIncome: 150_000,
+      fixedCosts: {
+        rent: 550_000,
+        managementFee: 120_000,
+        communication: 55_000,
+        insurance: 89_000,
+        subscriptions: 42_000,
+        installment: 230_000,
+      },
+      variableCosts: {
+        food: 480_000,
+        transport: 95_000,
+        shopping: 80_000,
+        leisure: 50_000,
+      },
+      investmentCosts: { education: 120_000, books: 30_000, people: 40_000 },
+      capitalAllocation: {
+        savings: 300_000,
+        investment: 100_000,
+        debtRepayment: 80_000,
+        remaining: 150_000,
+      },
+    });
   }
 
   return (
@@ -60,6 +98,24 @@ export default function IncomePage() {
 
       {view === "input" ? (
         <>
+        <SummaryBar
+          className="mb-3 lg:hidden"
+          items={[
+            { label: "매출", value: formatKRW(computed.grossProfit) },
+            { label: "비용", value: formatKRW(computed.totalExpenses) },
+            {
+              label: "영업이익(순이익)",
+              value: formatKRW(computed.operatingIncome),
+              tone: computed.operatingIncome < 0 ? "neg" : "pos",
+            },
+          ]}
+          operators={["−"]}
+        />
+        {!hasData ? (
+          <div className="mb-3">
+            <SampleDataCard onApply={applySample} />
+          </div>
+        ) : null}
         <div className="grid gap-4 lg:grid-cols-2">
           <Card>
             <CardTitle>입력</CardTitle>
@@ -158,18 +214,28 @@ export default function IncomePage() {
           <Card className="lg:sticky lg:top-6 lg:self-start">
             <CardTitle>자동 계산 결과</CardTitle>
             <div className="flex flex-col gap-3">
-              <StatBlock label="매출총이익" value={formatKRW(computed.grossProfit)} />
+              <StatBlock
+                label="매출총이익"
+                value={formatKRW(computed.grossProfit)}
+                placeholder={!hasData}
+              />
               <div className="grid grid-cols-3 gap-3">
-                <StatBlock label="고정비" value={formatKRW(computed.fixedTotal)} tone="negative" />
-                <StatBlock label="변동비" value={formatKRW(computed.variableTotal)} tone="negative" />
-                <StatBlock label="투자비" value={formatKRW(computed.investmentTotal)} tone="negative" />
+                <StatBlock label="고정비" value={formatKRW(computed.fixedTotal)} tone="negative" placeholder={!hasData} />
+                <StatBlock label="변동비" value={formatKRW(computed.variableTotal)} tone="negative" placeholder={!hasData} />
+                <StatBlock label="투자비" value={formatKRW(computed.investmentTotal)} tone="negative" placeholder={!hasData} />
               </div>
-              <StatBlock label="영업비용 소계" value={formatKRW(computed.totalExpenses)} tone="negative" />
+              <StatBlock
+                label="영업비용 소계"
+                value={formatKRW(computed.totalExpenses)}
+                tone="negative"
+                placeholder={!hasData}
+              />
               <StatBlock
                 label="영업이익(순이익)"
                 value={formatKRW(computed.operatingIncome)}
                 tone={toneForValue(computed.operatingIncome)}
                 sub={computed.operatingIncome < 0 ? "적자 — 비용이 매출을 초과했습니다" : "흑자"}
+                placeholder={!hasData}
               />
             </div>
           </Card>
@@ -180,7 +246,7 @@ export default function IncomePage() {
             title="비용 구조"
             total={computed.totalExpenses}
             data={[
-              { name: "고정비", value: computed.fixedTotal, color: "#1b2a4a" },
+              { name: "고정비", value: computed.fixedTotal, color: "#3730a3" },
               { name: "변동비", value: computed.variableTotal, color: "#4b6a9b" },
               { name: "투자비", value: computed.investmentTotal, color: "#15803d" },
             ]}

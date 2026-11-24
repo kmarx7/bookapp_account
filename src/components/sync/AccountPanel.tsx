@@ -112,7 +112,7 @@ export function AccountPanel() {
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               placeholder="you@example.com"
-              className="h-11 flex-1 rounded-xl border border-border px-3 text-sm outline-none transition-colors focus:border-brand"
+              className="h-11 flex-1 rounded-xl border border-border px-3 text-sm outline-none transition-colors focus:border-brand focus:ring-2 focus:ring-brand/40"
             />
             <Button onClick={sendLink} disabled={busy || !email.trim()}>
               <Send size={16} />

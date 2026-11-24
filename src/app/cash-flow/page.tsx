@@ -11,6 +11,8 @@ import { FieldGroup, FieldRow } from "@/components/forms/FieldRow";
 import { CurrencyInput } from "@/components/forms/CurrencyInput";
 import { Sheet, SheetGroup, SheetRow } from "@/components/statement/Sheet";
 import { ViewTabs, type SheetView } from "@/components/statement/ViewTabs";
+import { SummaryBar } from "@/components/statement/SummaryBar";
+import { SampleDataCard } from "@/components/statement/SampleDataCard";
 import { LazyCashFlowBar as CashFlowBar } from "@/components/charts/lazy";
 import { useSelectedMonth } from "@/hooks/useSelectedMonth";
 import { useAppStore } from "@/store/useAppStore";
@@ -51,8 +53,26 @@ export default function CashFlowPage() {
   const current = record ?? createCashFlow(userId, year, month);
   const computed = calcCashFlow(current);
 
+  const hasData =
+    current.operating.inflow !== 0 ||
+    current.operating.outflow !== 0 ||
+    current.investing.inflow !== 0 ||
+    current.investing.outflow !== 0 ||
+    current.financing.inflow !== 0 ||
+    current.financing.outflow !== 0 ||
+    current.beginningCash !== 0;
+
   function update(patch: Partial<CashFlow>) {
     upsert({ ...current, ...patch, userId, updatedAt: new Date().toISOString() });
+  }
+
+  function applySample() {
+    update({
+      operating: { inflow: 3_350_000, outflow: 2_560_000 },
+      investing: { inflow: 0, outflow: 300_000 },
+      financing: { inflow: 0, outflow: 230_000 },
+      beginningCash: 1_200_000,
+    });
   }
 
   function updateSection(
@@ -119,6 +139,27 @@ export default function CashFlowPage() {
 
       {view === "input" ? (
         <>
+        <SummaryBar
+          className="mb-3 lg:hidden"
+          items={[
+            { label: "기초 현금", value: formatKRW(current.beginningCash) },
+            {
+              label: "순증가(순현금흐름)",
+              value: formatKRW(computed.netIncrease),
+            },
+            {
+              label: "기말 현금잔고",
+              value: formatKRW(computed.endingCash),
+              tone: computed.netIncrease < 0 ? "neg" : "pos",
+            },
+          ]}
+          operators={["+"]}
+        />
+        {!hasData ? (
+          <div className="mb-3">
+            <SampleDataCard onApply={applySample} />
+          </div>
+        ) : null}
         <div className="grid gap-4 lg:grid-cols-2">
           <Card>
             <CardTitle>입력</CardTitle>
@@ -153,11 +194,11 @@ export default function CashFlowPage() {
           <Card className="lg:sticky lg:top-6 lg:self-start">
             <CardTitle>자동 계산 결과</CardTitle>
             <div className="flex flex-col gap-3">
-              <StatBlock label="순영업현금흐름" value={formatKRW(computed.opNet)} tone={toneForValue(computed.opNet)} />
-              <StatBlock label="순투자현금흐름" value={formatKRW(computed.invNet)} tone={toneForValue(computed.invNet)} />
-              <StatBlock label="순재무현금흐름" value={formatKRW(computed.finNet)} tone={toneForValue(computed.finNet)} />
-              <StatBlock label="순현금증가액" value={formatKRW(computed.netIncrease)} tone={toneForValue(computed.netIncrease)} />
-              <StatBlock label="기말 현금잔고" value={formatKRW(computed.endingCash)} />
+              <StatBlock label="순영업현금흐름" value={formatKRW(computed.opNet)} tone={toneForValue(computed.opNet)} placeholder={!hasData} />
+              <StatBlock label="순투자현금흐름" value={formatKRW(computed.invNet)} tone={toneForValue(computed.invNet)} placeholder={!hasData} />
+              <StatBlock label="순재무현금흐름" value={formatKRW(computed.finNet)} tone={toneForValue(computed.finNet)} placeholder={!hasData} />
+              <StatBlock label="순현금증가액" value={formatKRW(computed.netIncrease)} tone={toneForValue(computed.netIncrease)} placeholder={!hasData} />
+              <StatBlock label="기말 현금잔고" value={formatKRW(computed.endingCash)} placeholder={!hasData} />
             </div>
           </Card>
         </div>

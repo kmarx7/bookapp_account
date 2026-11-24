@@ -20,6 +20,7 @@ export function Sidebar() {
           <Link
             key={item.href}
             href={item.href}
+            aria-current={active ? "page" : undefined}
             className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors ${
               active
                 ? "bg-brand text-white"

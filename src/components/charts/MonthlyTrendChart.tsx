@@ -56,7 +56,7 @@ export function MonthlyTrendChart({ data }: { data: MonthlyPoint[] }) {
           <Bar
             dataKey="gross"
             name="매출"
-            fill="#1b2a4a"
+            fill="#3730a3"
             radius={[4, 4, 0, 0]}
             isAnimationActive={!reduced}
           />

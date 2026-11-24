@@ -17,6 +17,7 @@ export function BottomTabBar() {
             <li key={item.href} className="flex-1">
               <Link
                 href={item.href}
+                aria-current={active ? "page" : undefined}
                 className={`flex flex-col items-center gap-1 py-2.5 text-[11px] ${
                   active ? "text-brand" : "text-muted"
                 }`}

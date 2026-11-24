@@ -70,7 +70,7 @@ export default function SettingsPage() {
               <input
                 value={nickname}
                 onChange={(event) => setNickname(event.target.value)}
-                className="h-11 rounded-xl border border-border px-3 text-sm outline-none transition-colors focus:border-brand"
+                className="h-11 rounded-xl border border-border px-3 text-sm outline-none transition-colors focus:border-brand focus:ring-2 focus:ring-brand/40"
               />
             </label>
             <label className="flex flex-col gap-2">
@@ -79,7 +79,7 @@ export default function SettingsPage() {
                 type="date"
                 value={foundedAt}
                 onChange={(event) => setFoundedAt(event.target.value)}
-                className="num h-11 rounded-xl border border-border px-3 text-sm outline-none transition-colors focus:border-brand"
+                className="num h-11 rounded-xl border border-border px-3 text-sm outline-none transition-colors focus:border-brand focus:ring-2 focus:ring-brand/40"
               />
             </label>
             <div className="flex justify-end">

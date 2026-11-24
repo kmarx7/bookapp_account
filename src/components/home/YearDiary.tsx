@@ -44,7 +44,7 @@ function AmountField({
         value={value ? formatNumber(value) : ""}
         placeholder="0"
         onChange={(event) => onChange(parseAmount(event.target.value))}
-        className="num h-8 w-20 rounded-lg border border-border bg-surface px-2 text-right text-xs text-brand-dark outline-none transition-colors focus:border-brand"
+        className="num h-8 w-20 rounded-lg border border-border bg-surface px-2 text-right text-xs text-brand-dark outline-none transition-colors focus:border-brand focus:ring-2 focus:ring-brand/40"
       />
       <span>원</span>
     </label>
@@ -153,7 +153,7 @@ export function YearDiary({
                 profile: event.target.value as BusinessProfile,
               })
             }
-            className="h-8 rounded-lg border border-border bg-surface px-2 text-xs text-brand-dark outline-none focus:border-brand"
+            className="h-8 rounded-lg border border-border bg-surface px-2 text-xs text-brand-dark outline-none focus:border-brand focus:ring-2 focus:ring-brand/40"
           >
             {BUSINESS_PROFILES.map((profile) => (
               <option key={profile} value={profile}>
@@ -403,7 +403,7 @@ export function YearDiary({
             onChange={(event) => setCustomTitle(event.target.value)}
             placeholder="내 일정 (예: 보험 갱신)"
             aria-label="내 일정 제목"
-            className="h-8 min-w-32 flex-1 rounded-lg border border-border bg-surface px-2 text-xs text-brand-dark outline-none transition-colors focus:border-brand"
+            className="h-8 min-w-32 flex-1 rounded-lg border border-border bg-surface px-2 text-xs text-brand-dark outline-none transition-colors focus:border-brand focus:ring-2 focus:ring-brand/40"
           />
           <input
             value={customDay}
@@ -411,7 +411,7 @@ export function YearDiary({
             placeholder="일"
             aria-label="내 일정 날짜(일)"
             inputMode="numeric"
-            className="num h-8 w-14 rounded-lg border border-border bg-surface px-2 text-center text-xs text-brand-dark outline-none transition-colors focus:border-brand"
+            className="num h-8 w-14 rounded-lg border border-border bg-surface px-2 text-center text-xs text-brand-dark outline-none transition-colors focus:border-brand focus:ring-2 focus:ring-brand/40"
           />
           <button
             type="submit"

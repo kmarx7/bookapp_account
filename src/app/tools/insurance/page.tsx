@@ -75,7 +75,7 @@ export default function InsurancePage() {
                     value={item.name}
                     placeholder="보험 이름"
                     onChange={(event) => updateItem(item.id, { name: event.target.value })}
-                    className="h-10 flex-1 rounded-xl border border-border px-3 text-sm outline-none transition-colors focus:border-brand"
+                    className="h-10 flex-1 rounded-xl border border-border px-3 text-sm outline-none transition-colors focus:border-brand focus:ring-2 focus:ring-brand/40"
                   />
                   <select
                     value={item.kind}
