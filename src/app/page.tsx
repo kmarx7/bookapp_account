@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Plus, ChevronRight } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { OnboardingGuide } from "@/components/home/OnboardingGuide";
@@ -35,6 +36,8 @@ export default function HomePage() {
   );
   const incomeStatements = useAppStore((state) => state.incomeStatements);
   const cashFlows = useAppStore((state) => state.cashFlows);
+  const setSelectedMonth = useAppStore((state) => state.setSelectedMonth);
+  const router = useRouter();
   const learn = courseStats(useAppStore());
 
   const trend = useMemo(() => {
@@ -49,6 +52,8 @@ export default function HomePage() {
       const computedIncome = record ? calcIncomeStatement(record) : null;
       return {
         label: `${m}월`,
+        year: y,
+        month: m,
         gross: computedIncome?.grossProfit ?? 0,
         expense: computedIncome?.totalExpenses ?? 0,
       };
@@ -58,11 +63,31 @@ export default function HomePage() {
   const incomeComputed = income ? calcIncomeStatement(income) : null;
   const balanceComputed = balanceSheet ? calcBalanceSheet(balanceSheet) : null;
 
-  const recent = [...incomeStatements]
-    .map((item) => ({ id: item.id, label: `${item.year}년 ${item.month}월 손익계산서`, at: item.updatedAt }))
-    .concat(
-      cashFlows.map((item) => ({ id: `cf-${item.id}`, label: `${item.year}년 ${item.month}월 현금흐름표`, at: item.updatedAt })),
-    )
+  const recent: {
+    id: string;
+    kind: "income" | "cash-flow";
+    year: number;
+    month: number;
+    label: string;
+    at: string;
+  }[] = [
+    ...incomeStatements.map((item) => ({
+      id: item.id,
+      kind: "income" as const,
+      year: item.year,
+      month: item.month,
+      label: `${item.year}년 ${item.month}월 손익계산서`,
+      at: item.updatedAt,
+    })),
+    ...cashFlows.map((item) => ({
+      id: `cf-${item.id}`,
+      kind: "cash-flow" as const,
+      year: item.year,
+      month: item.month,
+      label: `${item.year}년 ${item.month}월 현금흐름표`,
+      at: item.updatedAt,
+    })),
+  ]
     .sort((a, b) => b.at.localeCompare(a.at))
     .slice(0, 5);
 
@@ -100,7 +125,20 @@ export default function HomePage() {
           )}
         </Card>
 
-        <Card>
+        <Card className="group relative transition-shadow hover:border-brand hover:shadow-md">
+          <Link
+            href="/income"
+            aria-label="손익계산서 상세 보기"
+            className="absolute inset-0 rounded-2xl"
+          >
+            <span className="sr-only">손익계산서로 이동</span>
+          </Link>
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute right-5 top-5 rounded-full bg-brand-soft px-2.5 py-1 text-[10px] font-bold text-brand opacity-0 transition-opacity group-hover:opacity-100"
+          >
+            자세히 →
+          </span>
           <CardTitle hint="손익계산서">이번 달 요약</CardTitle>
           {incomeComputed ? (
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -119,7 +157,7 @@ export default function HomePage() {
               action={
                 <Link
                   href="/income"
-                  className="inline-flex h-9 items-center rounded-xl bg-brand px-3 text-sm text-white"
+                  className="relative z-10 inline-flex h-9 items-center rounded-xl bg-brand px-3 text-sm text-white"
                 >
                   손익계산서 작성
                 </Link>
@@ -130,10 +168,29 @@ export default function HomePage() {
 
         <Card>
           <CardTitle hint="최근 6개월">손익 추이</CardTitle>
-          <MonthlyTrendChart data={trend} />
+          <MonthlyTrendChart
+            data={trend}
+            onSelectMonth={(y, m) => {
+              setSelectedMonth(y, m);
+              router.push("/income");
+            }}
+          />
         </Card>
 
-        <Card>
+        <Card className="group relative transition-shadow hover:border-brand hover:shadow-md">
+          <Link
+            href="/balance-sheet"
+            aria-label="재무상태표 상세 보기"
+            className="absolute inset-0 rounded-2xl"
+          >
+            <span className="sr-only">재무상태표로 이동</span>
+          </Link>
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute right-5 top-5 rounded-full bg-brand-soft px-2.5 py-1 text-[10px] font-bold text-brand opacity-0 transition-opacity group-hover:opacity-100"
+          >
+            자세히 →
+          </span>
           <CardTitle
             hint={balanceSheet ? `기준일 ${formatDate(balanceSheet.baseDate)}` : undefined}
           >
@@ -163,7 +220,7 @@ export default function HomePage() {
               action={
                 <Link
                   href="/balance-sheet"
-                  className="inline-flex h-9 items-center rounded-xl bg-brand px-3 text-sm text-white"
+                  className="relative z-10 inline-flex h-9 items-center rounded-xl bg-brand px-3 text-sm text-white"
                 >
                   재무상태표 작성
                 </Link>
@@ -172,7 +229,20 @@ export default function HomePage() {
           )}
         </Card>
 
-        <Card>
+        <Card className="group relative transition-shadow hover:border-brand hover:shadow-md">
+          <Link
+            href="/annual"
+            aria-label="감사의견 상세 보기"
+            className="absolute inset-0 rounded-2xl"
+          >
+            <span className="sr-only">연간 추적으로 이동</span>
+          </Link>
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute right-5 top-5 rounded-full bg-brand-soft px-2.5 py-1 text-[10px] font-bold text-brand opacity-0 transition-opacity group-hover:opacity-100"
+          >
+            자세히 →
+          </span>
           <CardTitle hint={`${year}년`}>감사의견 상태</CardTitle>
           <div className="flex items-center justify-between">
             <p className="text-sm text-muted">
@@ -186,7 +256,7 @@ export default function HomePage() {
           </div>
           <Link
             href="/annual"
-            className="mt-4 inline-flex text-sm font-medium text-brand hover:underline"
+            className="relative z-10 mt-4 inline-flex text-sm font-medium text-brand hover:underline"
           >
             연간 추적에서 서명하기 →
           </Link>
@@ -197,9 +267,22 @@ export default function HomePage() {
           {recent.length > 0 ? (
             <ul className="flex flex-col divide-y divide-border">
               {recent.map((item) => (
-                <li key={item.id} className="flex items-center justify-between py-2.5 text-sm">
-                  <span className="text-brand-dark">{item.label}</span>
-                  <span className="num text-xs text-muted">{formatDate(item.at)}</span>
+                <li key={item.id}>
+                  <Link
+                    href={item.kind === "income" ? "/income" : "/cash-flow"}
+                    onClick={() => setSelectedMonth(item.year, item.month)}
+                    className="group -mx-2 flex items-center justify-between gap-2 rounded-lg px-2 py-2.5 text-sm transition-colors hover:bg-brand-soft"
+                  >
+                    <span className="text-brand-dark">{item.label}</span>
+                    <span className="flex items-center gap-1.5">
+                      <span className="num text-xs text-muted">{formatDate(item.at)}</span>
+                      <ChevronRight
+                        size={16}
+                        aria-hidden="true"
+                        className="-translate-x-1 text-muted opacity-0 transition-all group-hover:translate-x-0 group-hover:text-brand group-hover:opacity-100"
+                      />
+                    </span>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -213,8 +296,9 @@ export default function HomePage() {
 
       <Link
         href="/income"
+        aria-label="새 항목 추가"
+        title="새 항목 추가"
         className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] right-5 z-10 flex h-14 w-14 items-center justify-center rounded-full bg-brand text-white shadow-lg transition-transform hover:scale-105 print:hidden md:bottom-8 md:right-8"
-        aria-label="빠른 입력"
       >
         <Plus size={24} />
       </Link>

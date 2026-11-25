@@ -45,6 +45,12 @@ export interface AppState extends AppData {
   courseFocus: string | null;
   setCourseFocus: (stepId: string | null) => void;
   /**
+   * 홈·장표·달력이 공유하는 조회 중인 연·월. 차트/최근 활동 클릭으로 월을 옮길 때 쓴다.
+   * 저장/동기화 대상이 아니다(toAppData에 포함되지 않는다).
+   */
+  selectedMonth: { year: number; month: number } | null;
+  setSelectedMonth: (year: number, month: number) => void;
+  /**
    * 한 실습 단계의 데이터만 초기화한다(대표 정보·다른 단계 데이터는 유지).
    * 수동 완료 표시도 함께 해제해 그 단계가 "미완료"로 돌아간다.
    */
@@ -177,6 +183,10 @@ export const useAppStore = create<AppState>((set, get) => ({
     storeCourseFocus(stepId);
     set({ courseFocus: stepId });
   },
+
+  selectedMonth: null,
+
+  setSelectedMonth: (year, month) => set({ selectedMonth: { year, month } }),
 
   toggleCalendarDone: (key) =>
     set((state) => {

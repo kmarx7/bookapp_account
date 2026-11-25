@@ -16,14 +16,29 @@ import { chartColors, krwTooltip } from "@/lib/chartTheme";
 
 export interface MonthlyPoint {
   label: string;
+  year: number;
+  month: number;
   gross: number;
   expense: number;
 }
 
 const AXIS = { fontSize: 11, fill: chartColors.axis };
 
-export function MonthlyTrendChart({ data }: { data: MonthlyPoint[] }) {
+export function MonthlyTrendChart({
+  data,
+  onSelectMonth,
+}: {
+  data: MonthlyPoint[];
+  /** 막대 클릭 시 호출 — 보통 해당 월을 현재 월로 지정하고 손익계산서로 이동한다. */
+  onSelectMonth?: (year: number, month: number) => void;
+}) {
   const reduced = useReducedMotion();
+
+  function handleBarClick(entry: { payload?: MonthlyPoint }) {
+    const payload = entry?.payload;
+    if (!onSelectMonth || !payload) return;
+    onSelectMonth(payload.year, payload.month);
+  }
 
   if (data.every((point) => point.gross === 0 && point.expense === 0)) {
     return (
@@ -60,6 +75,8 @@ export function MonthlyTrendChart({ data }: { data: MonthlyPoint[] }) {
             fill={chartColors.primary}
             radius={[4, 4, 0, 0]}
             isAnimationActive={!reduced}
+            onClick={handleBarClick}
+            style={{ cursor: "pointer" }}
           />
           <Bar
             dataKey="expense"
@@ -67,6 +84,8 @@ export function MonthlyTrendChart({ data }: { data: MonthlyPoint[] }) {
             fill={chartColors.negative}
             radius={[4, 4, 0, 0]}
             isAnimationActive={!reduced}
+            onClick={handleBarClick}
+            style={{ cursor: "pointer" }}
           />
         </BarChart>
       </ResponsiveContainer>
