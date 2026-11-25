@@ -14,8 +14,9 @@ import {
 import { ChartFigure } from "@/components/charts/ChartFigure";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { formatCompactKRW, formatKRW } from "@/lib/format";
+import { chartColors, krwTooltip } from "@/lib/chartTheme";
 
-const AXIS = { fontSize: 11, fill: "#5f6773" };
+const AXIS = { fontSize: 11, fill: chartColors.axis };
 
 export function CashFlowBar({
   data,
@@ -40,7 +41,7 @@ export function CashFlowBar({
     <ChartFigure title="활동별 순현금흐름" description={description}>
       <ResponsiveContainer width="100%" height={220}>
         <BarChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e2e6ee" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke={chartColors.grid} vertical={false} />
           <XAxis dataKey="name" tick={AXIS} tickLine={false} axisLine={false} />
           <YAxis
             tick={AXIS}
@@ -49,8 +50,8 @@ export function CashFlowBar({
             width={48}
             tickFormatter={(value: number) => formatCompactKRW(value)}
           />
-          <ReferenceLine y={0} stroke="#c9cfda" />
-          <Tooltip formatter={(value) => formatKRW(Number(value))} />
+          <ReferenceLine y={0} stroke={chartColors.guide} />
+          <Tooltip formatter={krwTooltip} />
           <Bar
             dataKey="value"
             name="순현금흐름"
@@ -60,7 +61,7 @@ export function CashFlowBar({
             {data.map((item) => (
               <Cell
                 key={item.name}
-                fill={item.value < 0 ? "#c0392b" : "#15803d"}
+                fill={item.value < 0 ? chartColors.negative : chartColors.positive}
               />
             ))}
           </Bar>

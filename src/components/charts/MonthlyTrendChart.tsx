@@ -12,6 +12,7 @@ import {
 import { ChartFigure } from "@/components/charts/ChartFigure";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { formatCompactKRW, formatKRW } from "@/lib/format";
+import { chartColors, krwTooltip } from "@/lib/chartTheme";
 
 export interface MonthlyPoint {
   label: string;
@@ -19,7 +20,7 @@ export interface MonthlyPoint {
   expense: number;
 }
 
-const AXIS = { fontSize: 11, fill: "#5f6773" };
+const AXIS = { fontSize: 11, fill: chartColors.axis };
 
 export function MonthlyTrendChart({ data }: { data: MonthlyPoint[] }) {
   const reduced = useReducedMotion();
@@ -43,7 +44,7 @@ export function MonthlyTrendChart({ data }: { data: MonthlyPoint[] }) {
     <ChartFigure title="최근 6개월 손익 추이" description={description}>
       <ResponsiveContainer width="100%" height={220}>
         <BarChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e2e6ee" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke={chartColors.grid} vertical={false} />
           <XAxis dataKey="label" tick={AXIS} tickLine={false} axisLine={false} />
           <YAxis
             tick={AXIS}
@@ -52,18 +53,18 @@ export function MonthlyTrendChart({ data }: { data: MonthlyPoint[] }) {
             width={48}
             tickFormatter={(value: number) => formatCompactKRW(value)}
           />
-          <Tooltip formatter={(value) => formatKRW(Number(value))} />
+          <Tooltip formatter={krwTooltip} />
           <Bar
             dataKey="gross"
             name="매출"
-            fill="#3730a3"
+            fill={chartColors.primary}
             radius={[4, 4, 0, 0]}
             isAnimationActive={!reduced}
           />
           <Bar
             dataKey="expense"
             name="영업비용"
-            fill="#c0392b"
+            fill={chartColors.negative}
             radius={[4, 4, 0, 0]}
             isAnimationActive={!reduced}
           />

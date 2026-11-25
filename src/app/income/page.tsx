@@ -26,6 +26,7 @@ import {
   VARIABLE_COST_LABELS,
 } from "@/lib/constants";
 import { formatKRW } from "@/lib/format";
+import { expenseStructureColors } from "@/lib/chartTheme";
 import type { IncomeStatement } from "@/types";
 
 export default function IncomePage() {
@@ -246,9 +247,9 @@ export default function IncomePage() {
             title="비용 구조"
             total={computed.totalExpenses}
             data={[
-              { name: "고정비", value: computed.fixedTotal, color: "#3730a3" },
-              { name: "변동비", value: computed.variableTotal, color: "#4b6a9b" },
-              { name: "투자비", value: computed.investmentTotal, color: "#15803d" },
+              { name: "고정비", value: computed.fixedTotal, color: expenseStructureColors[0] },
+              { name: "변동비", value: computed.variableTotal, color: expenseStructureColors[1] },
+              { name: "투자비", value: computed.investmentTotal, color: expenseStructureColors[2] },
             ]}
           />
         </Card>

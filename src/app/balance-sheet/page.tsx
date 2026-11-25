@@ -27,6 +27,7 @@ import {
   FIXED_ASSET_LABELS,
 } from "@/lib/constants";
 import { formatDate, formatKRW, formatPercent } from "@/lib/format";
+import { assetCompositionColors } from "@/lib/chartTheme";
 import type { BalanceSheet as BalanceSheetType } from "@/types";
 
 export default function BalanceSheetPage() {
@@ -258,8 +259,8 @@ export default function BalanceSheetPage() {
             title="자산 구성"
             total={computed.totalAssets}
             data={[
-              { name: "유동자산", value: computed.totalCurrentAssets, color: "#3730a3" },
-              { name: "고정자산", value: computed.totalFixedAssets, color: "#4b6a9b" },
+              { name: "유동자산", value: computed.totalCurrentAssets, color: assetCompositionColors[0] },
+              { name: "고정자산", value: computed.totalFixedAssets, color: assetCompositionColors[1] },
             ]}
           />
         </Card>
